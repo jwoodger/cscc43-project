@@ -12,7 +12,7 @@ public class MainMenu {
         login(connection);
         break;
       case 2:
-        register(connection);
+        new RegistrationMenu().start(connection);
         break;
       case 3:
         reports(connection);
@@ -22,15 +22,6 @@ public class MainMenu {
 
   public void login(Connection connection) {
     String username = MenuUtils.askString("Username");
-  }
-
-  public void register(Connection connection) {
-    int hostOrRenter = MenuUtils.menu("Register new user.", "Register as host.", "Register as renter.");
-    Date dob = MenuUtils.askDate("Date of birth");
-    String firstName = MenuUtils.askString("First name");
-    String lastName = MenuUtils.askString("Last name");
-    String sin = MenuUtils.askString("SIN");
-    String occupation = MenuUtils.askString("Occupation");
   }
 
   public void reports(Connection connection) {

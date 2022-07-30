@@ -14,7 +14,6 @@ public class App {
   public static String loadPassword(String fileName) throws IOException {
     InputStream passwordFile = ClassLoader.getSystemResourceAsStream(fileName);
     BufferedReader reader = new BufferedReader(new InputStreamReader(passwordFile));
-
     return reader.readLine();
   }
 
@@ -23,11 +22,11 @@ public class App {
     try {
       password = loadPassword("password.txt");
     } catch (IOException exception) {
-      System.err.println("Could not find password file.");
+      System.err.println("Could not find password.txt file.");
       return;
     }
 
-    String url = "jdbc:mysql://localhost:3306";
+    String url = "jdbc:mysql://localhost:3306/mybnb";
     Connection cxn = DriverManager.getConnection(url, "root", password);
 
     new MainMenu().start(cxn);

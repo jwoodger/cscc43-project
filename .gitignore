@@ -42,4 +42,4 @@ bin/
 .DS_Store
 
 ### Project Files ###
-src/main/resources/password
+src/main/resources/password.txt

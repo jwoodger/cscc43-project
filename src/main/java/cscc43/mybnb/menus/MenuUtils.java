@@ -1,8 +1,7 @@
 package cscc43.mybnb.menus;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -41,16 +40,15 @@ public final class MenuUtils {
     return scanner.next();
   }
 
-  public static Date askDate(String prompt) {
-    var fmt = new SimpleDateFormat("yyyy-MM-dd");
-    Date result = null;
+  public static LocalDate askDate(String prompt) {
+    LocalDate result = null;
 
     while (result == null) {
       System.out.printf("%s (YYYY-MM-DD): ", prompt);
       String str = scanner.next();
       try {
-        result = fmt.parse(str);
-      } catch (ParseException e) {
+        result = LocalDate.parse(str);
+      } catch (DateTimeParseException e) {
         System.out.println("Invalid format.");
         result = null;
       }
