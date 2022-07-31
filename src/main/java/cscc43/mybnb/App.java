@@ -29,7 +29,7 @@ public class App {
     String url = "jdbc:mysql://localhost:3306/mybnb";
     Connection cxn = DriverManager.getConnection(url, "root", password);
 
-    new MainMenu().start(cxn);
+    new MainMenu(cxn).start();
 
     cxn.close();
   }

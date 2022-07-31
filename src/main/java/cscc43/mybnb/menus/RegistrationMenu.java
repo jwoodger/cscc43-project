@@ -8,8 +8,13 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class RegistrationMenu {
+  private Connection connection;
 
-  public void start(Connection connection) {
+  public RegistrationMenu(Connection connection) {
+    this.connection = connection;
+  }
+
+  public void start() {
     int hostOrRenter = MenuUtils.menu("Register new user.", "Register as host.", "Register as renter.");
     String username = MenuUtils.askString("Username");
     LocalDate dob = MenuUtils.askDate("Date of birth");

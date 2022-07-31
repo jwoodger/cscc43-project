@@ -1,6 +1,7 @@
 package cscc43.mybnb.entities;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,6 +14,7 @@ public class User {
   private String sin;
   private String occupation;
   private String username;
+  protected int id;
 
   public User(LocalDate dob, String firstName, String lastName, String sin, String occupation, String username) {
     this.dob = dob;
@@ -21,6 +23,15 @@ public class User {
     this.sin = sin;
     this.occupation = occupation;
     this.username = username;
+    id = 0;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public String getUsername() {
+    return username;
   }
 
   public int insert(Connection connection) throws SQLException {
@@ -39,9 +50,13 @@ public class User {
     if (affected > 0) {
       ResultSet results = insertStmt.getGeneratedKeys();
       if (results.next()) {
+        results.close();
+        insertStmt.close();
         return results.getInt(1);
       }
+      results.close();
     }
+    insertStmt.close();;
     return -1;
   }
 }

@@ -1,30 +1,38 @@
 package cscc43.mybnb.menus;
 
 import java.sql.Connection;
-import java.util.Date;
 
 public class MainMenu {
+  private Connection connection;
 
-  public void start(Connection connection) {
-    int result = MenuUtils.menu("Welcome to MyBNB!", "Log in.", "Register new user.", "Generate reports.");
-    switch (result) {
-      case 1:
-        login(connection);
-        break;
-      case 2:
-        new RegistrationMenu().start(connection);
-        break;
-      case 3:
-        reports(connection);
-        break;
+  public MainMenu(Connection connection) {
+    this.connection = connection;
+  }
+
+  public void start() {
+    int result = 0;
+
+    while (result != 4) {
+      result = MenuUtils.menu("Welcome to MyBNB!",
+          "Log in.",
+          "Register new user.",
+          "Generate reports.",
+          "Quit");
+      switch (result) {
+        case 1:
+          new LoginMenu(connection).start();
+          break;
+        case 2:
+          new RegistrationMenu(connection).start();
+          break;
+        case 3:
+          reports();
+          break;
+      }
     }
   }
 
-  public void login(Connection connection) {
-    String username = MenuUtils.askString("Username");
-  }
-
-  public void reports(Connection connection) {
+  public void reports() {
     int report = MenuUtils.menu("Choose a report.",
         "Total bookings by city",
         "Total bookings by zipcode",
