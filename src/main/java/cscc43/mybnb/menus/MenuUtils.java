@@ -6,7 +6,10 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public final class MenuUtils {
-  private static Scanner scanner = new Scanner(System.in);
+  private static Scanner scanner;
+  static {
+    scanner = new Scanner(System.in);
+  }
 
   public static int menu(String title, String... options) {
     int result = -1;
@@ -32,12 +35,13 @@ public final class MenuUtils {
         scanner.next();
       }
     }
+    scanner.nextLine();
     return result;
   }
 
   public static String askString(String prompt) {
     System.out.printf("%s: ", prompt);
-    return scanner.next();
+    return scanner.nextLine();
   }
 
   public static LocalDate askDate(String prompt) {
@@ -54,6 +58,26 @@ public final class MenuUtils {
       }
     }
 
+    scanner.nextLine();
+    return result;
+  }
+
+  public static double askDouble(String prompt) {
+    boolean finished = false;
+    double result = 0f;
+
+    while (!finished) {
+      System.out.printf("%s: ", prompt);
+      try {
+        result = scanner.nextDouble();
+        finished = true;
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid format.");
+        scanner.next();
+      }
+    }
+
+    scanner.nextLine();
     return result;
   }
 }
