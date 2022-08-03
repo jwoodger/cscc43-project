@@ -1,6 +1,8 @@
 package cscc43.mybnb.menus;
 
+import cscc43.mybnb.entities.User;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class MainMenu {
   private Connection connection;
@@ -12,10 +14,11 @@ public class MainMenu {
   public void start() {
     int result = 0;
 
-    while (result != 4) {
+    while (result != 5) {
       result = MenuUtils.menu("Welcome to MyBNB!",
           "Log in.",
           "Register new user.",
+          "Delete user.",
           "Generate reports.",
           "Quit");
       switch (result) {
@@ -26,9 +29,22 @@ public class MainMenu {
           new RegistrationMenu(connection).start();
           break;
         case 3:
+          deleteUser();
+          break;
+        case 4:
           reports();
           break;
       }
+    }
+  }
+
+  public void deleteUser() {
+    String username = MenuUtils.askString("Username to delete.");
+    try {
+      User.deleteByUsername(connection, username);
+    } catch (SQLException e) {
+      e.printStackTrace(System.err);
+      System.exit(1);
     }
   }
 

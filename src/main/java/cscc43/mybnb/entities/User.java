@@ -16,6 +16,14 @@ public class User {
   private String username;
   protected int id;
 
+  public static boolean deleteByUsername(Connection connection, String username) throws SQLException {
+    PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM User WHERE STRCMP(User.username, ?) = 0");
+    deleteStmt.setString(1, username);
+
+    int affected = deleteStmt.executeUpdate();
+    return affected > 0;
+  }
+
   public User(LocalDate dob, String firstName, String lastName, String sin, String occupation, String username) {
     this.dob = dob;
     this.firstName = firstName;
@@ -50,9 +58,10 @@ public class User {
     if (affected > 0) {
       ResultSet results = insertStmt.getGeneratedKeys();
       if (results.next()) {
+        int id = results.getInt(1);
         results.close();
         insertStmt.close();
-        return results.getInt(1);
+        return id;
       }
       results.close();
     }
