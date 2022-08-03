@@ -25,3 +25,9 @@ But they can only comment if the stay was completed
 
 
 */
+-- Postal Code
+/*
+The same postal code structure is present within a country.
+We are assuming all postal codes are 6 alphanumeric characters and similar to the canadian postal code format.
+Adjacent postal codes have first 3 characters matching.
+*/

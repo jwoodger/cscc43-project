@@ -87,12 +87,10 @@ CREATE TABLE Listing(
   Title VARCHAR(32) NOT NULL CHECK (LENGTH(Title)>0),
   Street_Address VARCHAR(32) NOT NULL CHECK (LENGTH(Street_Address)>0),
   City VARCHAR(32) NOT NULL CHECK (LENGTH(City)>0),
-  Province VARCHAR(32) DEFAULT NULL CHECK(LENGTH(Province)>0),
   Country VARCHAR(32) NOT NULL CHECK (LENGTH(Country)>0),
   Postal_Code CHAR(6) NOT NULL,
   Latitude FLOAT CHECK(Latitude >= -90 AND Latitude <=90),
   Longitude FLOAT CHECK(Longitude >= -90 AND Longitude <=90),
-  Price REAL CHECK(Price>0),
   PRIMARY KEY(Listing_ID)
 );
 -- error message and check on insert
@@ -108,11 +106,7 @@ end if;
     if  length(new.City)=0 then
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'City cannot be empty';
-end if; 
-    if  length(new.Province)=0 then
-        SIGNAL SQLSTATE '45000'   
-        SET MESSAGE_TEXT = 'Province cannot be empty';
-end if; 
+end if;
     if  length(new.Country)=0 then
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Country cannot be empty';
@@ -137,11 +131,7 @@ end if;
     if  length(new.City)=0 then
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'City cannot be empty';
-end if; 
-    if  length(new.Province)=0 then
-        SIGNAL SQLSTATE '45000'   
-        SET MESSAGE_TEXT = 'Province cannot be empty';
-end if; 
+end if;
     if  length(new.Country)=0 then
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Country cannot be empty';
@@ -272,6 +262,7 @@ END;
 delimiter ;
 
 CREATE TABLE Booking(
+BookingID Integer AUTO_INCREMENT not null PRIMARY KEY
 Calendar_ID INTEGER references Calendar_Section(Calendar_ID) ON UPDATE CASCADE ON DELETE CASCADE,
 Renter_ID Integer references Renter(Renter_ID) ON UPDATE CASCADE ON DELETE CASCADE,
 Cancelled smallint default 0 CHECK(Cancelled>=0 and Cancelled <=2), -- 0 for not cancelled, 1 for cancelled by Renter, 2 for cancelled by Host
