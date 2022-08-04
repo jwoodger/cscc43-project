@@ -178,7 +178,7 @@ CREATE TABLE Provides_Amenity(
 
 
 CREATE TABLE Calendar_Section(
-  Calendar_ID INTEGER UNIQUE,
+  Calendar_ID INTEGER UNIQUE AUTO_INCREMENT,
   Date_From DATE NOT NULL,
   Date_To DATE NOT NULL,
   Renter_ID INTEGER DEFAULT NULL,

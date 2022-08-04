@@ -38,6 +38,7 @@ public class Listing {
       double longitude = results.getDouble("Longitude");
 
       var listing = new Listing(host, title, streetAddress, city, country, postalCode, latitude, longitude);
+      listing.id = id;
       listings.add(listing);
     }
 
@@ -72,6 +73,10 @@ public class Listing {
 
   public String getCountry() {
     return country;
+  }
+
+  public int getId() {
+    return id;
   }
 
   public boolean hasAmenity(Amenity amenity) {
