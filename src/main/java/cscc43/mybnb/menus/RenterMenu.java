@@ -29,7 +29,12 @@ public class RenterMenu {
   }
 
   public void bookListing() {
-    new QueryMenu(connection).start();
+    boolean results = new QueryMenu(connection).start();
+    if(!results)return;
+    // TODO: Assume the user sees the print out from query menu and just inputs an calendar ID
+    // TODO: check the calendar id is available, if it is add a booking entry
+    // TODO: if not tell the user that calendar entry is already booked
+
     String title = MenuUtils.askString("Enter title of listing.");
     Listing listing = null;
     try {
