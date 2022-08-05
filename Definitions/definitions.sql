@@ -19,7 +19,7 @@ CREATE trigger tr_ins_User
 BEFORE insert on User
 FOR EACH ROW
 BEGIN
-	if length(new.Occupation=0) then
+	if length(new.Occupation)=0 then
 		SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Occupation cannot be empty';
 end if;
@@ -44,7 +44,7 @@ CREATE trigger tr_upd_User
 BEFORE update on User
 FOR EACH ROW
 BEGIN
-	if length(new.Occupation=0) then
+	if length(new.Occupation)=0 then
 		SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Occupation cannot be empty';
 end if;
@@ -99,7 +99,7 @@ CREATE trigger tr_ins_Listing
 BEFORE insert on Listing
 FOR EACH ROW
 BEGIN
-	if length(new.Title=0) then
+	if length(new.Title)=0 then
 		SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Title cannot be empty';
 end if;
@@ -124,7 +124,7 @@ CREATE trigger tr_upd_Listing
 BEFORE update on Listing
 FOR EACH ROW
 BEGIN
-	if length(new.Title=0) then
+	if length(new.Title)=0 then
 		SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Title cannot be empty';
 end if;
@@ -262,7 +262,7 @@ END;
 delimiter ;
 
 CREATE TABLE Booking(
-BookingID Integer AUTO_INCREMENT not null PRIMARY KEY
+BookingID Integer AUTO_INCREMENT not null PRIMARY KEY,
 Calendar_ID INTEGER references Calendar_Section(Calendar_ID) ON UPDATE CASCADE ON DELETE CASCADE,
 Renter_ID Integer references Renter(Renter_ID) ON UPDATE CASCADE ON DELETE CASCADE,
 Cancelled smallint default 0 CHECK(Cancelled>=0 and Cancelled <=2), -- 0 for not cancelled, 1 for cancelled by Renter, 2 for cancelled by Host
@@ -336,7 +336,7 @@ CREATE trigger tr_ins_Com
 BEFORE insert on Comment
 FOR EACH ROW
 BEGIN
-if(new.Text <=0) then
+if length(new.Text)<=0 then
 	SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Comment cannot be empty';
 end if;
@@ -364,7 +364,7 @@ CREATE trigger tr_upd_Com
 BEFORE update on Comment
 FOR EACH ROW
 BEGIN
-if(new.Text <=0) then
+if length(new.Text)<=0 then
 	SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Comment cannot be empty';
 end if;
