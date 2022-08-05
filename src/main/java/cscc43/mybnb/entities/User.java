@@ -23,7 +23,15 @@ public class User {
     int affected = deleteStmt.executeUpdate();
     return affected > 0;
   }
-
+  public static String getUsernameFromID(Connection c,int id) throws SQLException{
+    PreparedStatement s = c.prepareStatement("select username from user where user_id = ?");
+    s.setInt(1,id);
+    ResultSet r = s.executeQuery();
+    while (r.next()){
+      return r.getString("username");
+    }
+    return "ERROR";
+  }
   public User(LocalDate dob, String firstName, String lastName, String sin, String occupation, String username) {
     this.dob = dob;
     this.firstName = firstName;

@@ -15,7 +15,7 @@ public class QueryMenu {
         this.connection = connection;
     }
 
-    public void start() {
+    public boolean start() {
         int choice = MenuUtils.menu("Listing Queries","By distance","by postal code","by exact address","by host","By title","None");
         try{
             dropView("v1");
@@ -46,29 +46,45 @@ public class QueryMenu {
         int choice2 = MenuUtils.menu("Would you like to add more specifications?","Yes","No");
         dropView("v2");
         if(choice2 == 1){
-            custom(choice == 3);
+            custom(choice == 3,choice == 2);
         }else{
-            sql.executeUpdate("create view v2 as select Title,Price,Date_From,Date_To,Available from v1 NATURAL JOIN Calendar_Section");
+            sql.executeUpdate("create view v2 as select * from v1 NATURAL JOIN Calendar_Section");
         }
-        printresults();
+        return printresults();
         }
         catch(SQLException e){
             e.printStackTrace();
         }
+        return false;
     }
-    public void printresults() throws SQLException{
+    public boolean printresults() throws SQLException{
         Statement s = connection.createStatement();
-        ResultSet r = s.executeQuery("select * from v2");
-        //print out each result
-        System.out.println("Title  Price   Date_From  Date_To   Available");
-        while(r.next()){
-            String title = r.getString("Title");
-            double price = r.getDouble("Price");
-            Date from = r.getDate("Date_From");
-            Date to = r.getDate("Date_To");
-            boolean available = r.getBoolean("Available");
-            System.out.println(title+"   "+price+"   "+from.toLocalDate()+"   "+to.toLocalDate()+"   "+available);
+        int order = MenuUtils.menu("Sort by Price:","Ascending","Descending");
+        ResultSet r = s.executeQuery("select * from v2 order by price "+((order==1)?"asc":"desc"));
+        if(!r.isBeforeFirst()){System.out.println("No results found!");
+        return false;
         }
+        //print out each result
+        while(r.next()){
+            System.out.println("---------------------------------------");
+            String title = r.getString("Title");
+            System.out.println("Title :"+title);
+            System.out.println("Rented by :"+Host.getUsernameFromID(connection,r.getInt("Host_ID")) );
+            System.out.println("Calendar ID :"+r.getString("Calendar_ID"));
+            double price = r.getDouble("Price");
+            System.out.println("Price :"+price);
+            Date from = r.getDate("Date_From");
+            System.out.println("Date From :"+from.toLocalDate());
+            Date to = r.getDate("Date_To");
+            System.out.println("Date To :"+to.toLocalDate());
+            System.out.println("Street Address :"+r.getString("Street_Address"));
+            System.out.println("Country :"+r.getString("Country"));
+            System.out.println("City :"+r.getString("City"));
+            System.out.println("ZipCode :"+r.getString("Postal_Code"));
+            boolean available = r.getBoolean("Available");
+            System.out.println("Available?: "+(available?"YES":"NOPE"));
+        }
+        return true;
     }
     public void dropView(String s){
         try {
@@ -78,7 +94,7 @@ public class QueryMenu {
             e.printStackTrace();
         }
     }
-    public void custom(Boolean exact) throws SQLException{
+    public void custom(Boolean exact,Boolean postal) throws SQLException{
     dropView("temp1");
     //FILTER BY PRICE
     Statement sql = connection.createStatement();
@@ -110,12 +126,14 @@ public class QueryMenu {
 
     //FILTER BY COUNTRY / CITY
         dropView("temp3");
-    if(exact == Boolean.FALSE){
-    c = MenuUtils.menu("Add filter on Country and City?","Yes","No");
+    if(exact == false && postal == false) {
+        c = MenuUtils.menu("Add filter on Country and City?", "Yes", "No");
+    }else{
+        System.out.println("Skipping the filter on Country / City, since that was specified earlier");
     }
-    if(c==1 && exact == Boolean.FALSE){
-        PreparedStatement ps = connection.prepareStatement("create view temp3 as select * from temp2 where " +
-                " Country == ? and City like ?");
+    if(c==1 && exact == false && postal == false){
+        PreparedStatement ps = connection.prepareStatement("create view temp3 as select * from v1 where " +
+                " Country = ? and City LIKE ?");
         String country = MenuUtils.askString("Country ?");
         String City = MenuUtils.askString("City? (write % for all cities)");
         ps.setString(1,country);
@@ -133,22 +151,28 @@ public class QueryMenu {
             ArrayList<String> s =PrintAmenities();
             ArrayList<String> choices = new ArrayList<>();
             String choice;
+            boolean nothing = true;
             choice = MenuUtils.askString("Which ones to you want (enter none to start query)?");
-            while (!choice.equals("none") || s.isEmpty()){
+            while (!choice.equals("none") && !s.isEmpty()){
+
                 if(s.contains(choice)){
                     choices.add(choice);
                     s.remove(choice);
                 }
+
+                for(int i =0; i<s.size();i++)
+                    System.out.println(s.get(i));
+                choice = MenuUtils.askString("Which ones to you want (enter none to start query)?");
             }
             //build our where clause
             String query = "";
             while(!choices.isEmpty()){
-                query = query.concat(" EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = " +
-                        choices.get(0)+") ");
+                query = query.concat(" EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = \'" +
+                        choices.get(0)+"\') ");
                 choices.remove(0);
-                if(!choices.isEmpty())query += "AND";
+                if(!choices.isEmpty()){query += "AND";}else{query = "where "+query;}
             }
-            sql.executeUpdate("create view v2 as select * from temp3 L where "+query);
+            sql.executeUpdate("create view v2 as select * from temp3 L "+query);
         }else{
             sql.executeUpdate("create view v2 as select * from temp3");
         }
@@ -183,11 +207,13 @@ public class QueryMenu {
     }
     public  void postal() throws  SQLException{
         PreparedStatement sql = connection.prepareStatement("create view v1 as select * from Listing where " +
-                "Country = ? AND Postal_Code like ?");
+                "Country = ? AND Postal_Code like ? AND City = ?");
         String country = MenuUtils.askString("Country? ");
+        String City = MenuUtils.askString("City?");
         String PC = MenuUtils.askString("PostalCode? ");
         sql.setString(1,country);
         sql.setString(2,PC.substring(0,3)+"%");
+        sql.setString(3,City);
         sql.executeUpdate();
     }
     public void exact() throws SQLException{
@@ -207,11 +233,10 @@ public class QueryMenu {
         PreparedStatement sql = connection.prepareStatement("create view v1 as select * from listing where " +
                 "Host_ID = ?");
         String uname = MenuUtils.askString("Host Username?");
-        try {
+
             sql.setInt(1, Host.getByUsername(connection, uname).getId());
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+            sql.executeUpdate();
+
 
         }
     public void bytitle() throws SQLException{
@@ -219,6 +244,7 @@ public class QueryMenu {
                 "Title like ?");
         String title = MenuUtils.askString("Title?");
         sql.setString(1,title+"%");
+        sql.executeUpdate();
     }
 
 }

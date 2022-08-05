@@ -63,7 +63,7 @@ public class CalendarSection {
 
   public int insert(Connection connection) throws SQLException {
     var stmt = connection.prepareStatement("INSERT INTO Calendar_Section(Date_From, Date_To, Listing_ID, Price)"
-      + "VALUES(?, ?, ?, ?, NULL)",
+      + "VALUES(?, ?, ?, ?)",
         Statement.RETURN_GENERATED_KEYS);
     stmt.setObject(1, from);
     stmt.setObject(2, until);
