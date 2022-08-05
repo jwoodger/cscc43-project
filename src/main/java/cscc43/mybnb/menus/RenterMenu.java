@@ -2,6 +2,7 @@ package cscc43.mybnb.menus;
 
 import cscc43.mybnb.entities.Booking;
 import cscc43.mybnb.entities.CalendarSection;
+import cscc43.mybnb.entities.Comment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
 import java.sql.Connection;
@@ -24,6 +25,9 @@ public class RenterMenu {
     switch (choice) {
       case 1:
         bookListing();
+        break;
+      case 3:
+        comment();
         break;
     }
   }
@@ -72,6 +76,44 @@ public class RenterMenu {
     var booking = new Booking(bookedSection, renter);
     try {
       booking.insert(connection);
+    } catch (SQLException e) {
+      e.printStackTrace(System.err);
+      System.exit(1);
+    }
+  }
+
+  public void comment() {
+    List<Booking.Info> info = null;
+    try {
+      info = Booking.getAllRecent(connection, renter);
+    } catch (SQLException e) {
+      e.printStackTrace(System.err);
+      System.exit(1);
+    }
+    if (info.size() == 0) {
+      System.out.println("No non-cancelled bookings from the last 30 days to comment on.");
+      return;
+    }
+
+    String[] names = new String[info.size()];
+    for (int i = 0; i < info.size(); i++) {
+      var bi = info.get(i);
+      names[i] = String.format("%s: %s - %s; booked %s",
+          bi.getListingTitle(),
+          bi.getCalendarFrom().toString(),
+          bi.getCalendarTo().toString(),
+          bi.getBooking().getBookedDate().toString());
+    }
+
+    int choice = MenuUtils.menu("Choose booking to comment on", names);
+    var booking = info.get(choice - 1).getBooking();
+
+    String commentText = MenuUtils.askString("What would you like to say");
+    int rating = MenuUtils.askInt("Rating (1-5)");
+    var comment = new Comment(commentText, rating);
+
+    try {
+      comment.insert(connection);
     } catch (SQLException e) {
       e.printStackTrace(System.err);
       System.exit(1);

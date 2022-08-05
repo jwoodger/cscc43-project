@@ -80,4 +80,23 @@ public final class MenuUtils {
     scanner.nextLine();
     return result;
   }
+
+  public static int askInt(String prompt) {
+    boolean finished = false;
+    int result = 0;
+
+    while (!finished) {
+      System.out.printf("%s: ", prompt);
+      try {
+        result = scanner.nextInt();
+        finished = true;
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid input.");
+        scanner.next();
+      }
+    }
+
+    scanner.nextLine();
+    return result;
+  }
 }
