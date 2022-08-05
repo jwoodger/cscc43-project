@@ -20,13 +20,9 @@ public class Listing {
   private double longitude;
   private List<Amenity> amenities;
 
-  public static List<Listing> getAllForHost(Connection connection, Host host) throws SQLException {
+  private static List<Listing> getList(PreparedStatement statement) throws SQLException {
     List<Listing> listings = new ArrayList<>();
-
-    PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing WHERE Host_Id = ?");
-    stmt.setInt(1, host.getId());
-
-    ResultSet results = stmt.executeQuery();
+    ResultSet results = statement.executeQuery();
     while (results.next()) {
       int id = results.getInt("Listing_ID");
       String title = results.getString("Title");
@@ -37,12 +33,28 @@ public class Listing {
       double latitude = results.getDouble("Latitude");
       double longitude = results.getDouble("Longitude");
 
-      var listing = new Listing(host, title, streetAddress, city, country, postalCode, latitude, longitude);
+      var listing = new Listing(null, title, streetAddress, city, country, postalCode, latitude, longitude);
       listing.id = id;
       listings.add(listing);
     }
 
     results.close();
+    return listings;
+  }
+
+  public static List<Listing> getAllForHost(Connection connection, Host host) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing WHERE Host_Id = ?");
+    stmt.setInt(1, host.getId());
+    var listings = getList(stmt);
+    stmt.close();
+    return listings;
+  }
+
+  public static List<Listing> getAllByTitle(Connection connection, String title) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing WHERE STRCMP(Title, ?) = 0");
+    stmt.setString(1, title);
+    var listings = getList(stmt);
+    stmt.close();
     return listings;
   }
 

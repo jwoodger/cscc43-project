@@ -40,7 +40,7 @@ public class QueryMenu {
                 bytitle();
                 break;
             default:
-                sql.executeUpdate("create view v1 as select * from listing");
+                sql.executeUpdate("create view v1 as select * from Listing");
         }
 
         int choice2 = MenuUtils.menu("Would you like to add more specifications?","Yes","No");
@@ -48,7 +48,7 @@ public class QueryMenu {
         if(choice2 == 1){
             custom(choice == 3);
         }else{
-            sql.executeUpdate("create view v2 as select Title,Price,Date_From,Date_To,Available from v1 NATURAL JOIN calendar_section");
+            sql.executeUpdate("create view v2 as select Title,Price,Date_From,Date_To,Available from v1 NATURAL JOIN Calendar_Section");
         }
         printresults();
         }
@@ -84,7 +84,7 @@ public class QueryMenu {
     Statement sql = connection.createStatement();
     int c = MenuUtils.menu("Add filter on price?","Yes","No");
     if(c==1){
-        PreparedStatement ps = connection.prepareStatement("create view temp1 as select * from v1 NATURAL JOIN calendar_section " +
+        PreparedStatement ps = connection.prepareStatement("create view temp1 as select * from v1 NATURAL JOIN Calendar_Section " +
                 "where price >= ? and price <= ?");
         double lower = MenuUtils.askDouble("lower price point?");
         double upper = MenuUtils.askDouble("upper price point?");
@@ -92,7 +92,7 @@ public class QueryMenu {
         ps.setDouble(2,upper);
         ps.executeUpdate();
     }
-    else{sql.executeUpdate("create view temp1 as select * from v1 NATURAL JOIN calendar_section");}
+    else{sql.executeUpdate("create view temp1 as select * from v1 NATURAL JOIN Calendar_Section");}
     //FILTER BY DATE
     dropView("temp2");
     c = MenuUtils.menu("Add filter on Dates?","Yes","No");
@@ -182,7 +182,7 @@ public class QueryMenu {
 
     }
     public  void postal() throws  SQLException{
-        PreparedStatement sql = connection.prepareStatement("create view v1 as select * from listing where " +
+        PreparedStatement sql = connection.prepareStatement("create view v1 as select * from Listing where " +
                 "Country = ? AND Postal_Code like ?");
         String country = MenuUtils.askString("Country? ");
         String PC = MenuUtils.askString("PostalCode? ");

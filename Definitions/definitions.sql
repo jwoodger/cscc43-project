@@ -221,7 +221,7 @@ where	C.Calendar_ID != new.Calendar_ID AND
         SET MESSAGE_TEXT = 'Date Overlaps';
 end if;
 
-if (new.Available = false and NOT(Renter_ID=NULL)) OR(new.Available=True and Renter_ID=NULL) then
+if (new.Available = false and NOT(new.Renter_ID=NULL)) OR(new.Available=True and new.Renter_ID=NULL) then
 	SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Cannot be unavailable and have no renter/ available and have renter';
 end if;
@@ -253,7 +253,7 @@ where	C.Calendar_ID != new.Calendar_ID AND
         SET MESSAGE_TEXT = 'Date Overlaps';
 end if;
 
-if (new.Available = false and NOT(Renter_ID=NULL)) OR(new.Available=True and Renter_ID=NULL) then
+if (new.Available = false and NOT(new.Renter_ID=NULL)) OR(new.Available=True and new.Renter_ID=NULL) then
 	SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Cannot be unavailable and have no renter/ available and have renter';
 end if;

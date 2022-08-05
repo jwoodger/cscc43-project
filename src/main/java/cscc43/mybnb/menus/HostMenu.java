@@ -98,7 +98,7 @@ public class HostMenu {
       names[i] = listings.get(i).getTitle();
     }
     int choice = MenuUtils.menu("Choose a listing:", names);
-    Listing listing = listings.get(choice);
+    Listing listing = listings.get(choice - 1);
 
     LocalDate dateFrom = MenuUtils.askDate("First day available");
     LocalDate dateTo = MenuUtils.askDate("Last day available");
