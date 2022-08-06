@@ -36,6 +36,9 @@ public class HostMenu {
       case 2:
         createCalendarSection();
         break;
+      case 3:
+        editListing();
+        break;
       case 5:
         commentOnUser();
         break;
@@ -120,6 +123,39 @@ public class HostMenu {
       section.insert(connection);
     } catch (SQLException e) {
       e.printStackTrace(System.err);
+      System.exit(1);
+    }
+  }
+
+  public void editListing() {
+    List<Listing> listings = null;
+    try {
+      listings = Listing.getAllForHost(connection, host);
+    } catch (SQLException e) {
+      e.printStackTrace(System.err);
+      System.exit(1);
+    }
+    if (listings.size() == 0) {
+      System.out.println("No listings for this host. Please create a listing first.");
+      return;
+    }
+
+    String[] names = new String[listings.size()];
+    for (int i = 0; i < listings.size(); i++) {
+      names[i] = listings.get(i).getTitle();
+    }
+
+    int choice = MenuUtils.menu("Listing to edit", names);
+    Listing listing = listings.get(choice - 1);
+
+    addAmenities(listing);
+
+    try {
+      for (Amenity amenity : listing.getAmenities()) {
+        listing.insertAmenity(connection, amenity);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
       System.exit(1);
     }
   }

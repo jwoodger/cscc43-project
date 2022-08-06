@@ -20,7 +20,21 @@ public class Listing {
   private double longitude;
   private List<Amenity> amenities;
 
-  private static List<Listing> getList(PreparedStatement statement) throws SQLException {
+  private static void loadAmenities(Connection connection, Listing listing) throws SQLException {
+    var stmt = connection.prepareStatement("SELECT * FROM Provides_Amenity WHERE Listing_ID = ?");
+    stmt.setInt(1, listing.getId());
+
+    ResultSet results = stmt.executeQuery();
+    while (results.next()) {
+      String name = results.getString("Amenity_Name");
+      listing.addAmenity(new Amenity(name));
+    }
+
+    results.close();
+    stmt.close();
+  }
+
+  private static List<Listing> getList(Connection connection, PreparedStatement statement) throws SQLException {
     List<Listing> listings = new ArrayList<>();
     ResultSet results = statement.executeQuery();
     while (results.next()) {
@@ -36,6 +50,8 @@ public class Listing {
       var listing = new Listing(null, title, streetAddress, city, country, postalCode, latitude, longitude);
       listing.id = id;
       listings.add(listing);
+
+      loadAmenities(connection, listing);
     }
 
     results.close();
@@ -44,7 +60,7 @@ public class Listing {
 
   public static List<Listing> getAll(Connection connection) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing");
-    var listings = getList(stmt);
+    var listings = getList(connection, stmt);
     stmt.close();
     return listings;
   }
@@ -52,7 +68,7 @@ public class Listing {
   public static List<Listing> getAllForHost(Connection connection, Host host) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing WHERE Host_Id = ?");
     stmt.setInt(1, host.getId());
-    var listings = getList(stmt);
+    var listings = getList(connection, stmt);
     stmt.close();
     return listings;
   }
@@ -60,7 +76,7 @@ public class Listing {
   public static List<Listing> getAllByTitle(Connection connection, String title) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing WHERE STRCMP(Title, ?) = 0");
     stmt.setString(1, title);
-    var listings = getList(stmt);
+    var listings = getList(connection, stmt);
     stmt.close();
     return listings;
   }
@@ -102,12 +118,16 @@ public class Listing {
     return amenities.stream().anyMatch(a -> a.getName().equals(amenity.getName()));
   }
 
+  public List<Amenity> getAmenities() {
+    return amenities;
+  }
+
   public void addAmenity(Amenity amenity) {
     amenities.add(amenity);
   }
 
-  private void insertAmenity(Connection connection, Amenity amenity) throws SQLException {
-    var stmt = connection.prepareStatement("INSERT INTO Provides_Amenity(Listing_ID, Amenity_Name)"
+  public void insertAmenity(Connection connection, Amenity amenity) throws SQLException {
+    var stmt = connection.prepareStatement("INSERT IGNORE INTO Provides_Amenity(Listing_ID, Amenity_Name)"
       + "VALUES (?, ?)");
     stmt.setInt(1, id);
     stmt.setString(2, amenity.getName());
