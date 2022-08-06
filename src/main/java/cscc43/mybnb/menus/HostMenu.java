@@ -3,10 +3,13 @@ package cscc43.mybnb.menus;
 import cscc43.mybnb.entities.Amenity;
 import cscc43.mybnb.entities.CalendarSection;
 import cscc43.mybnb.entities.Host;
+import cscc43.mybnb.entities.HostComment;
 import cscc43.mybnb.entities.Listing;
+import cscc43.mybnb.entities.Renter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HostMenu {
@@ -20,14 +23,22 @@ public class HostMenu {
 
   public void start() {
     String prompt = String.format("Logged in as %s", host.getUsername());
-    int choice = MenuUtils.menu(prompt, "Create listing", "Create availability", "Comment on user");
+    int choice = MenuUtils.menu(prompt,
+        "Create listing",
+        "Create availability",
+        "Edit listing",
+        "Edit calendar section",
+        "Comment on user");
     switch (choice) {
-    case 1:
-      createListing();
-      break;
-    case 2:
-      createCalendarSection();
-      break;
+      case 1:
+        createListing();
+        break;
+      case 2:
+        createCalendarSection();
+        break;
+      case 5:
+        commentOnUser();
+        break;
     }
   }
 
@@ -109,6 +120,40 @@ public class HostMenu {
       section.insert(connection);
     } catch (SQLException e) {
       e.printStackTrace(System.err);
+      System.exit(1);
+    }
+  }
+
+  public void commentOnUser() {
+    List<Renter> renters = null;
+    try {
+      renters = Renter.getForHost(connection, host);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    if (renters.size() == 0) {
+      System.out.println("No renters who have booked your listings.");
+      return;
+    }
+
+    String[] names = new String[renters.size()];
+    for (int i = 0; i < renters.size(); i++) {
+      Renter r = renters.get(i);
+      names[i] = r.getUsername();
+    }
+
+    int choice = MenuUtils.menu("Choose user to rate", names);
+    Renter renterToComment = renters.get(choice - 1);
+
+    String text = MenuUtils.askString("What would you like to say?");
+    int rating = MenuUtils.askInt("Rating(1 - 5)");
+
+    var comment = new HostComment(text, rating, host.getId(), renterToComment.getId());
+    try {
+      comment.insert(connection);
+    } catch (SQLException e) {
+      e.printStackTrace();
       System.exit(1);
     }
   }
