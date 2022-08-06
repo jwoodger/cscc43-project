@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
   implementation 'mysql:mysql-connector-java:8.0.29'
+  implementation 'org.apache.opennlp:opennlp-tools:2.0.0'
 }
 
 application {

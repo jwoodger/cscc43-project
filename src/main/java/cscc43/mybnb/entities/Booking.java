@@ -14,6 +14,7 @@ public class Booking {
   // title, etc.) that we retrieve from the DB.
   public static class Info {
     private Booking booking;
+    private int listingId;
     private String listingTitle;
     private int calendarId;
     private LocalDate calendarFrom;
@@ -35,6 +36,10 @@ public class Booking {
       return calendarTo;
     }
 
+    public int getListingId() {
+      return listingId;
+    }
+
     public int getCalendarId() {
       return calendarId;
     }
@@ -49,10 +54,10 @@ public class Booking {
   public static List<Info> getAllRecent(Connection connection, Renter renter) throws SQLException {
     var bookings = new ArrayList<Info>();
 
-    var stmt = connection.prepareStatement("SELECT B.*, C.Date_From, C.Date_To, L.Title "
+    var stmt = connection.prepareStatement("SELECT B.*, C.Date_From, C.Date_To, L.Title, L.Listing_ID "
       + "FROM Booking B JOIN Calendar_Section C ON B.Calendar_ID = C.Calendar_ID "
       + "JOIN Listing L ON C.Listing_ID = L.Listing_ID "
-      + "WHERE B.Renter_ID = ? AND B.BookedOn > NOW() - INTERVAL 30 DAY AND NOT B.Cancelled"
+      + "WHERE B.Renter_ID = ? AND B.BookedOn > NOW() - INTERVAL 1 YEAR AND NOT B.Cancelled"
     );
     stmt.setInt(1, renter.getId());
 
@@ -64,6 +69,7 @@ public class Booking {
       LocalDate calendarTo = results.getDate("Date_To").toLocalDate();
       String listingTitle = results.getString("Title");
       int calendarId = results.getInt("Calendar_ID");
+      int listingId = results.getInt("Listing_ID");
 
       var booking = new Booking(null, renter);
       booking.bookedDate = bookedDate;
@@ -74,6 +80,7 @@ public class Booking {
       info.calendarTo = calendarTo;
       info.listingTitle = listingTitle;
       info.calendarId = calendarId;
+      info.listingId = listingId;
       bookings.add(info);
     }
 

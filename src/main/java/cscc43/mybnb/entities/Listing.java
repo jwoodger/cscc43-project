@@ -42,6 +42,13 @@ public class Listing {
     return listings;
   }
 
+  public static List<Listing> getAll(Connection connection) throws SQLException {
+    PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing");
+    var listings = getList(stmt);
+    stmt.close();
+    return listings;
+  }
+
   public static List<Listing> getAllForHost(Connection connection, Host host) throws SQLException {
     PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Listing WHERE Host_Id = ?");
     stmt.setInt(1, host.getId());

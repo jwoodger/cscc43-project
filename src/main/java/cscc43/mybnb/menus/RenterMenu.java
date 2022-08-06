@@ -5,6 +5,7 @@ import cscc43.mybnb.entities.CalendarSection;
 import cscc43.mybnb.entities.Comment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
+import cscc43.mybnb.entities.RenterComment;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -112,10 +113,12 @@ public class RenterMenu {
 
     int choice = MenuUtils.menu("Choose booking to comment on", names);
     var booking = info.get(choice - 1).getBooking();
+    var listingId = info.get(choice - 1).getListingId();
 
     String commentText = MenuUtils.askString("What would you like to say");
     int rating = MenuUtils.askInt("Rating (1-5)");
-    var comment = new Comment(commentText, rating);
+
+    var comment = new RenterComment(commentText, rating, renter.getId(), listingId);
 
     try {
       comment.insert(connection);

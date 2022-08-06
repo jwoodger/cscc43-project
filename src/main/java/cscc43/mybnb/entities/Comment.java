@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Comment {
-  private int id;
-  private String text;
-  private int rating;
+public abstract class Comment {
+  protected int id;
+  protected String text;
+  protected int rating;
 
   public Comment(String text, int rating) {
     this.text = text;

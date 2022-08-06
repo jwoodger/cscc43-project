@@ -1,6 +1,7 @@
 package cscc43.mybnb.menus;
 
 import cscc43.mybnb.entities.User;
+import cscc43.mybnb.reports.NounPhraseReport;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -49,7 +50,7 @@ public class MainMenu {
   }
 
   public void reports() {
-    int report = MenuUtils.menu("Choose a report.",
+    int choice = MenuUtils.menu("Choose a report.",
         "Total bookings by city",
         "Total bookings by zipcode",
         "Total number of listings",
@@ -60,5 +61,10 @@ public class MainMenu {
         "Rank renters per city",
         "Most cancellations",
         "Most popular noun phrases for a listing");
+    switch (choice) {
+      case 10:
+        new NounPhraseReport(connection).run();
+        break;
+    }
   }
 }
