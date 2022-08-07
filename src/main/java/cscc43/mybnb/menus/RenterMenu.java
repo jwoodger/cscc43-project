@@ -58,6 +58,8 @@ public class RenterMenu {
       System.exit(1);
     }
 
+    sections.removeIf(c -> !c.isAvailable());
+
     if (sections.size() == 0) {
       System.out.println("No availability for this listing.");
       return;

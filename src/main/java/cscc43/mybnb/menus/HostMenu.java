@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import opennlp.tools.cmdline.parser.ParserTool;
 
 public class HostMenu {
   private Connection connection;
@@ -38,6 +39,9 @@ public class HostMenu {
         break;
       case 3:
         editListing();
+        break;
+      case 4:
+        editCalendarSection();
         break;
       case 5:
         commentOnUser();
@@ -192,5 +196,49 @@ public class HostMenu {
       e.printStackTrace();
       System.exit(1);
     }
+  }
+
+  public void editCalendarSection() {
+    List<Listing> listings = null;
+    try {
+      listings = Listing.getAllForHost(connection, host);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    if (listings.size() == 0) {
+      System.out.println("No listings for this host. Please create a listing first.");
+      return;
+    }
+
+    String[] listingNames = new String[listings.size()];
+    for (int i = 0; i < listings.size(); i++) {
+      listingNames[i] = listings.get(i).getTitle();
+    }
+
+    int l = MenuUtils.menu("Choose a listing.", listingNames);
+    Listing listing = listings.get(l - 1);
+
+    List<CalendarSection> calendarSections = null;
+    try {
+      calendarSections = CalendarSection.getAllForListing(connection, listing);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    if (calendarSections.size() == 0) {
+      System.out.println("No calendar sections for this listing. Please create an availability first.");
+      return;
+    }
+
+    String[] csNames = new String[calendarSections.size()];
+    for (int i = 0; i < calendarSections.size(); i++) {
+      CalendarSection cs = calendarSections.get(i);
+      csNames[i] = String.format("%s - %s", cs.getFrom().toString(), cs.getUntil().toString());
+    }
+    int c = MenuUtils.menu("Choice calendar section", csNames);
+    CalendarSection section = calendarSections.get(c - 1);
+
+    new CalendarSectionMenu(connection, section).start();
   }
 }

@@ -21,7 +21,7 @@ public class CalendarSection {
     List<CalendarSection> sections = new ArrayList<>();
     var stmt = connection.prepareStatement("SELECT * FROM Calendar_Section "
         + "JOIN Listing ON Calendar_Section.Listing_ID = Listing.Listing_ID "
-        + "WHERE Listing.Listing_ID = ? AND Calendar_Section.Available");
+        + "WHERE Listing.Listing_ID = ?");
     stmt.setInt(1, listing.getId());
 
     ResultSet results = stmt.executeQuery();
@@ -30,9 +30,11 @@ public class CalendarSection {
       LocalDate from = results.getDate("Calendar_Section.Date_From").toLocalDate();
       LocalDate to = results.getDate("Calendar_Section.Date_To").toLocalDate();
       float price = results.getFloat("Calendar_Section.Price");
+      boolean available = results.getBoolean("Calendar_Section.Available");
 
       var calendar = new CalendarSection(from, to, listing, price);
       calendar.id = id;
+      calendar.available = available;
       sections.add(calendar);
     }
 
@@ -59,6 +61,10 @@ public class CalendarSection {
 
   public LocalDate getUntil() {
     return until;
+  }
+
+  public boolean isAvailable() {
+    return available;
   }
 
   public int insert(Connection connection) throws SQLException {
@@ -90,5 +96,30 @@ public class CalendarSection {
       + "WHERE Calendar_ID = ?");
     stmt.setInt(1, id);
     stmt.executeUpdate();
+  }
+
+  public void updatePrice(Connection connection, float price) throws SQLException {
+    this.price = price;
+
+    var sql = "UPDATE Calendar_Section SET Price = ? WHERE Calendar_ID = ?";
+    var stmt = connection.prepareStatement(sql);
+    stmt.setFloat(1, price);
+    stmt.setInt(2, id);
+    stmt.executeUpdate();
+    stmt.close();
+  }
+
+  public void updateDates(Connection connection, LocalDate from, LocalDate to) throws SQLException {
+    this.from = from;
+    this.until = to;
+
+    var sql = "UPDATE Calendar_Section SET Date_From = ?, Date_To = ? WHERE Calendar_ID = ?";
+    var stmt = connection.prepareStatement(sql);
+    stmt.setObject(1, from);
+    stmt.setObject(2, to);
+    stmt.setInt(3, id);
+
+    stmt.executeUpdate();
+    stmt.close();
   }
 }
