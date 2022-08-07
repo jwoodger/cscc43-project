@@ -89,9 +89,10 @@ public class Booking {
   }
 
   public static List<Info> getAllRecent(Connection connection, Renter renter) throws SQLException {
-    var stmt = connection.prepareStatement("SELECT B.*, C.Date_From, C.Date_To, L.Title, L.Listing_ID "
+    var stmt = connection.prepareStatement("SELECT B.*, C.Date_From, C.Date_To, L.Title, L.Listing_ID, U.username "
       + "FROM Booking B JOIN Calendar_Section C ON B.Calendar_ID = C.Calendar_ID "
       + "JOIN Listing L ON C.Listing_ID = L.Listing_ID "
+      + "JOIN User U ON C.Renter_ID = U.User_ID "
       + "WHERE B.Renter_ID = ? AND B.BookedOn > NOW() - INTERVAL 1 YEAR AND NOT B.Cancelled"
     );
     stmt.setInt(1, renter.getId());
@@ -149,6 +150,14 @@ public class Booking {
 
   public void cancelByHost(Connection connection) throws SQLException {
     var sql = "UPDATE Booking SET Cancelled = 2 WHERE BookingID = ?";
+    var stmt = connection.prepareStatement(sql);
+    stmt.setInt(1, id);
+    stmt.executeUpdate();
+    stmt.close();
+  }
+
+  public void cancelByRenter(Connection connection) throws SQLException {
+    var sql = "UPDATE Booking SET Cancelled = 1 WHERE BookingID = ?";
     var stmt = connection.prepareStatement(sql);
     stmt.setInt(1, id);
     stmt.executeUpdate();

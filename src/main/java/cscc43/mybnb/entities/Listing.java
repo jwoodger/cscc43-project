@@ -81,6 +81,32 @@ public class Listing {
     return listings;
   }
 
+  public static Listing getById(Connection connection, int id) throws SQLException {
+    Listing listing = null;
+
+    var stmt = connection.prepareStatement("SELECT * FROM Listing WHERE Listing_ID = ?");
+    stmt.setInt(1, id);
+
+    ResultSet results = stmt.executeQuery();
+    if (results.next()) {
+      String title = results.getString("Title");
+      String streetAddress = results.getString("Street_Address");
+      String city = results.getString("City");
+      String country = results.getString("Country");
+      String postalCode = results.getString("Postal_Code");
+      double latitude = results.getDouble("Latitude");
+      double longitude = results.getDouble("Longitude");
+
+      listing = new Listing(null, title, streetAddress, city, country, postalCode, latitude, longitude);
+      listing.id = id;
+      loadAmenities(connection, listing);
+    }
+
+    results.close();
+    stmt.close();
+    return listing;
+  }
+
   public Listing(Host host, String title, String streetAddress, String city,
       String country, String postalCode, double latitude, double longitude) {
     this.host = host;

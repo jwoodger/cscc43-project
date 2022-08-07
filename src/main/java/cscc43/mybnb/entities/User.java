@@ -24,7 +24,7 @@ public class User {
     return affected > 0;
   }
   public static String getUsernameFromID(Connection c,int id) throws SQLException{
-    PreparedStatement s = c.prepareStatement("select username from user where user_id = ?");
+    PreparedStatement s = c.prepareStatement("select username from User where User_ID = ?");
     s.setInt(1,id);
     ResultSet r = s.executeQuery();
     while (r.next()){

@@ -27,6 +27,9 @@ public class RenterMenu {
       case 1:
         bookListing();
         break;
+      case 2:
+        cancelBooking();
+        break;
       case 3:
         comment();
         break;
@@ -40,14 +43,19 @@ public class RenterMenu {
     // TODO: check the calendar id is available, if it is add a booking entry
     // TODO: if not tell the user that calendar entry is already booked
 
-    String title = MenuUtils.askString("Enter title of listing.");
+    // String title = MenuUtils.askString("Enter title of listing.");
+    int id = MenuUtils.askInt("Enter ID of listing.");
     Listing listing = null;
     try {
       // TODO: select when different listings have the same title
-      listing = Listing.getAllByTitle(connection, title).get(0);
+      listing = Listing.getById(connection, id);
     } catch (SQLException e) {
       e.printStackTrace(System.err);
       System.exit(1);
+    }
+    if (listing == null) {
+      System.out.println("Could not find listing with that ID.");
+      return;
     }
 
     List<CalendarSection> sections = null;
@@ -73,6 +81,10 @@ public class RenterMenu {
 
     int choice = MenuUtils.menu("Choose availability", sectionNames);
     CalendarSection bookedSection = sections.get(choice - 1);
+    if (!bookedSection.isAvailable()) {
+      System.out.println("Section is not available.");
+      return;
+    }
 
     try {
       bookedSection.makeUnavailable(connection);
@@ -90,7 +102,7 @@ public class RenterMenu {
     }
   }
 
-  public void comment() {
+  public Booking.Info chooseBooking() {
     List<Booking.Info> info = null;
     try {
       info = Booking.getAllRecent(connection, renter);
@@ -99,8 +111,8 @@ public class RenterMenu {
       System.exit(1);
     }
     if (info.size() == 0) {
-      System.out.println("No non-cancelled bookings from the last 30 days to comment on.");
-      return;
+      System.out.println("No non-cancelled bookings from the last 30 days.");
+      return null;
     }
 
     String[] names = new String[info.size()];
@@ -114,8 +126,13 @@ public class RenterMenu {
     }
 
     int choice = MenuUtils.menu("Choose booking to comment on", names);
-    var booking = info.get(choice - 1).getBooking();
-    var listingId = info.get(choice - 1).getListingId();
+    return info.get(choice - 1);
+  }
+
+  public void comment() {
+    var info = chooseBooking();
+    var booking = info.getBooking();
+    var listingId = info.getListingId();
 
     String commentText = MenuUtils.askString("What would you like to say");
     int rating = MenuUtils.askInt("Rating (1-5)");
@@ -124,6 +141,17 @@ public class RenterMenu {
 
     try {
       comment.insert(connection);
+    } catch (SQLException e) {
+      e.printStackTrace(System.err);
+      System.exit(1);
+    }
+  }
+
+  public void cancelBooking() {
+    var info = chooseBooking();
+
+    try {
+      info.getBooking().cancelByRenter(connection);
     } catch (SQLException e) {
       e.printStackTrace(System.err);
       System.exit(1);
