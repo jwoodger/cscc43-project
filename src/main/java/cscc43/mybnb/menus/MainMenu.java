@@ -45,8 +45,8 @@ public class MainMenu {
     try {
       User.deleteByUsername(connection, username);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -55,7 +55,8 @@ public class MainMenu {
       new GeneralReport(connection).start();
     }
     catch(SQLException e){
-      e.printStackTrace();
+      MenuUtils.showError(e);
+      return;
     }
 
   }

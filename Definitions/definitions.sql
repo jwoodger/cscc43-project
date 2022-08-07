@@ -220,11 +220,6 @@ where	C.Calendar_ID != new.Calendar_ID AND
 		SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Date Overlaps';
 end if;
-
-if (new.Available = false and NOT(new.Renter_ID=NULL)) OR(new.Available=True and new.Renter_ID=NULL) then
-	SIGNAL SQLSTATE '45000'   
-        SET MESSAGE_TEXT = 'Cannot be unavailable and have no renter/ available and have renter';
-end if;
 END;
 //
 delimiter ;
@@ -251,11 +246,6 @@ where	C.Calendar_ID != new.Calendar_ID AND
 )) then
 		SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Date Overlaps';
-end if;
-
-if (new.Available = false and NOT(new.Renter_ID=NULL)) OR(new.Available=True and new.Renter_ID=NULL) then
-	SIGNAL SQLSTATE '45000'   
-        SET MESSAGE_TEXT = 'Cannot be unavailable and have no renter/ available and have renter';
 end if;
 END;
 //
@@ -346,15 +336,6 @@ if(new.Rating <0 or new.Rating > 5) then
 end if;
 -- can only comment if they have finished their stay i.e Date_To is passed but within 1 year from now()
 -- and There exists a Booking
-
-if not((select (Date_To) from Calendar_Section C where C.Calendar_ID = new.Calendar_ID) < now()
-	and YEAR((select (Date_To) from Calendar_Section C where C.Calendar_ID = new.Calendar_ID))+1>YEAR(now())
-    and EXISTS((select * from Booking where Booking.Calendar_ID = new.Calendar_ID and Booking.Cancelled =0)))
- then
- SIGNAL SQLSTATE '45000'   
-        SET MESSAGE_TEXT = 'Cannot Comment on about this listing';
-end if;
-
 END;
 //
 delimiter ;
@@ -374,15 +355,6 @@ if(new.Rating <0 or new.Rating > 5) then
 end if;
 -- can only comment if they have finished their stay i.e Date_To is passed but within 1 year from now()
 -- and There exists a Booking
-
-if not((select (Date_To) from Calendar_Section C where C.Calendar_ID = new.Calendar_ID) < now()
-	and YEAR((select (Date_To) from Calendar_Section C where C.Calendar_ID = new.Calendar_ID))+1>YEAR(now())
-    and EXISTS((select * from Booking where Booking.Calendar_ID = new.Calendar_ID and Booking.Cancelled =0)))
- then
- SIGNAL SQLSTATE '45000'   
-        SET MESSAGE_TEXT = 'Cannot Comment on about this listing';
-end if;
-
 END;
 //
 delimiter ;

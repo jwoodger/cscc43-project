@@ -91,13 +91,6 @@ public class CalendarSection {
     return -1;
   }
 
-  public void makeUnavailable(Connection connection) throws SQLException {
-    var stmt = connection.prepareStatement("UPDATE Calendar_Section SET Available = 0 "
-      + "WHERE Calendar_ID = ?");
-    stmt.setInt(1, id);
-    stmt.executeUpdate();
-  }
-
   public void updatePrice(Connection connection, float price) throws SQLException {
     this.price = price;
 

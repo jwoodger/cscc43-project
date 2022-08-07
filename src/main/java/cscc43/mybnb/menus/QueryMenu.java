@@ -53,7 +53,7 @@ public class QueryMenu {
         return printresults();
         }
         catch(SQLException e){
-            e.printStackTrace();
+            MenuUtils.showError(e);
         }
         return false;
     }
@@ -91,7 +91,7 @@ public class QueryMenu {
             Statement sql = connection.createStatement();
             sql.execute("DROP VIEW IF EXISTS "+s);
         }catch(SQLException e){
-            e.printStackTrace();
+            MenuUtils.showError(e);
         }
     }
     public void custom(Boolean exact,Boolean postal) throws SQLException{

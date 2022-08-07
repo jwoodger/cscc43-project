@@ -7,6 +7,7 @@ import cscc43.mybnb.entities.HostComment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
 
+import java.awt.MenuItem;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,29 +24,33 @@ public class HostMenu {
   }
 
   public void start() {
-    String prompt = String.format("Logged in as %s", host.getUsername());
-    int choice = MenuUtils.menu(prompt,
-        "Create listing",
-        "Create availability",
-        "Edit listing",
-        "Edit calendar section",
-        "Comment on user");
-    switch (choice) {
-      case 1:
-        createListing();
-        break;
-      case 2:
-        createCalendarSection();
-        break;
-      case 3:
-        editListing();
-        break;
-      case 4:
-        editCalendarSection();
-        break;
-      case 5:
-        commentOnUser();
-        break;
+    int choice = 0;
+    while (choice != 6) {
+      String prompt = String.format("Logged in as %s", host.getUsername());
+      choice = MenuUtils.menu(prompt,
+          "Create listing",
+          "Create availability",
+          "Edit listing",
+          "Edit calendar section",
+          "Comment on user",
+          "Log out");
+      switch (choice) {
+        case 1:
+          createListing();
+          break;
+        case 2:
+          createCalendarSection();
+          break;
+        case 3:
+          editListing();
+          break;
+        case 4:
+          editCalendarSection();
+          break;
+        case 5:
+          commentOnUser();
+          break;
+      }
     }
   }
 
@@ -81,7 +86,7 @@ public class HostMenu {
         price = -1.0;
       }
     }}catch (SQLException exception){
-      exception.printStackTrace();
+      MenuUtils.showError(exception);
       return price;
     }
     return price;
@@ -101,8 +106,8 @@ public class HostMenu {
     try {
       listing.insert(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -111,8 +116,8 @@ public class HostMenu {
     try {
       amenities = Amenity.getAll(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
 
     amenities.removeIf(a -> listing.hasAmenity(a));
@@ -150,8 +155,8 @@ public class HostMenu {
     try {
       listings = Listing.getAllForHost(connection, host);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
     if (listings.size() == 0) {
       System.out.println("No listings for this host. Please create a listing first.");
@@ -173,8 +178,8 @@ public class HostMenu {
     try {
       section.insert(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -183,8 +188,8 @@ public class HostMenu {
     try {
       listings = Listing.getAllForHost(connection, host);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
     if (listings.size() == 0) {
       System.out.println("No listings for this host. Please create a listing first.");
@@ -206,8 +211,8 @@ public class HostMenu {
         listing.insertAmenity(connection, amenity);
       }
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -216,8 +221,8 @@ public class HostMenu {
     try {
       renters = Renter.getForHost(connection, host);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
     if (renters.size() == 0) {
       System.out.println("No renters who have booked your listings.");
@@ -240,8 +245,8 @@ public class HostMenu {
     try {
       comment.insert(connection);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -250,8 +255,8 @@ public class HostMenu {
     try {
       listings = Listing.getAllForHost(connection, host);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
     if (listings.size() == 0) {
       System.out.println("No listings for this host. Please create a listing first.");
@@ -270,8 +275,8 @@ public class HostMenu {
     try {
       calendarSections = CalendarSection.getAllForListing(connection, listing);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
     if (calendarSections.size() == 0) {
       System.out.println("No calendar sections for this listing. Please create an availability first.");

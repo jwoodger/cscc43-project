@@ -1,5 +1,6 @@
 package cscc43.mybnb.menus;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
@@ -98,5 +99,9 @@ public final class MenuUtils {
 
     scanner.nextLine();
     return result;
+  }
+
+  public static void showError(SQLException exc) {
+    System.out.printf("An SQL error occurred: %s\n", exc);
   }
 }

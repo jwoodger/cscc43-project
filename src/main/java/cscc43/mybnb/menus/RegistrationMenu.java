@@ -34,7 +34,7 @@ public class RegistrationMenu {
     try {
       user.insert(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
+      MenuUtils.showError(e);
     }
   }
 }

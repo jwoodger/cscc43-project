@@ -21,37 +21,41 @@ public class RenterMenu {
   }
 
   public void start() {
-    String prompt = String.format("Logged in as %s", renter.getUsername());
-    int choice = MenuUtils.menu(prompt, "Book listing", "Cancel booking", "Comment on listing");
-    switch (choice) {
-      case 1:
-        bookListing();
-        break;
-      case 2:
-        cancelBooking();
-        break;
-      case 3:
-        comment();
-        break;
+    int choice = 0;
+    while (choice != 4) {
+      String prompt = String.format("Logged in as %s", renter.getUsername());
+      choice = MenuUtils.menu(prompt,
+          "Book listing",
+          "Cancel booking",
+          "Comment on listing",
+          "Log out");
+      switch (choice) {
+        case 1:
+          bookListing();
+          break;
+        case 2:
+          cancelBooking();
+          break;
+        case 3:
+          comment();
+          break;
+      }
     }
   }
 
   public void bookListing() {
     boolean results = new QueryMenu(connection).start();
-    if(!results)return;
-    // TODO: Assume the user sees the print out from query menu and just inputs an calendar ID
-    // TODO: check the calendar id is available, if it is add a booking entry
-    // TODO: if not tell the user that calendar entry is already booked
+    if (!results)
+      return;
 
-    // String title = MenuUtils.askString("Enter title of listing.");
     int id = MenuUtils.askInt("Enter ID of listing.");
     Listing listing = null;
     try {
       // TODO: select when different listings have the same title
       listing = Listing.getById(connection, id);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
     if (listing == null) {
       System.out.println("Could not find listing with that ID.");
@@ -62,8 +66,8 @@ public class RenterMenu {
     try {
       sections = CalendarSection.getAllForListing(connection, listing);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
 
     sections.removeIf(c -> !c.isAvailable());
@@ -86,19 +90,12 @@ public class RenterMenu {
       return;
     }
 
-    try {
-      bookedSection.makeUnavailable(connection);
-    } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
-    }
-
     var booking = new Booking(bookedSection, renter);
     try {
       booking.insert(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -107,8 +104,8 @@ public class RenterMenu {
     try {
       info = Booking.getAllRecent(connection, renter);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return null;
     }
     if (info.size() == 0) {
       System.out.println("No non-cancelled bookings from the last 30 days.");
@@ -142,8 +139,8 @@ public class RenterMenu {
     try {
       comment.insert(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -153,8 +150,8 @@ public class RenterMenu {
     try {
       info.getBooking().cancelByRenter(connection);
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 }

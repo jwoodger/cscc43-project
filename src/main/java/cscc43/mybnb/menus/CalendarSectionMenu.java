@@ -49,8 +49,8 @@ public class CalendarSectionMenu {
     try {
       section.updatePrice(connection, price);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -60,8 +60,8 @@ public class CalendarSectionMenu {
     try {
       section.updateDates(connection, from, to);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 
@@ -70,8 +70,8 @@ public class CalendarSectionMenu {
     try {
       info = Booking.getAllForCalendar(connection, section);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
 
     String[] names = new String[info.size()];
@@ -86,8 +86,8 @@ public class CalendarSectionMenu {
     try {
       booking.cancelByHost(connection);
     } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
+      MenuUtils.showError(e);
+      return;
     }
   }
 }

@@ -18,9 +18,17 @@ public class LoginMenu {
 
     if (hostOrRenter == 1) {
       Host host = loginHost(username);
+      if (host == null) {
+        System.out.println("Could not log in.");
+        return;
+      }
       new HostMenu(connection, host).start();
     } else {
       Renter renter = loginRenter(username);
+      if (renter == null) {
+        System.out.println("Could not log in.");
+        return;
+      }
       new RenterMenu(connection, renter).start();
     }
   }
@@ -30,10 +38,9 @@ public class LoginMenu {
       Renter renter = Renter.getByUsername(connection, username);
       return renter;
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return null;
     }
-    return null;
   }
 
   public Host loginHost(String username) {
@@ -41,9 +48,8 @@ public class LoginMenu {
       Host host = Host.getByUsername(connection, username);
       return host;
     } catch (SQLException e) {
-      e.printStackTrace(System.err);
-      System.exit(1);
+      MenuUtils.showError(e);
+      return null;
     }
-    return null;
   }
 }
