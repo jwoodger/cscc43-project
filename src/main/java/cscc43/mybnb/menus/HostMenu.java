@@ -6,8 +6,8 @@ import cscc43.mybnb.entities.Host;
 import cscc43.mybnb.entities.HostComment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
-import java.sql.Connection;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +49,43 @@ public class HostMenu {
     }
   }
 
+
+  //suggests price based on all the amenities in l plus the amenity in e plus city,and country
+  public double suggest_price(String City,String Country,List<Amenity> l,Amenity e)  {
+    double price = -1.0;
+    try{
+      String query = "";
+      if(e!=null){
+        query = query.concat("and EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = \'" +
+                e.getName()+"\') ");
+      }
+      if(l!=null && !l.isEmpty())
+      for(int i=0;i<l.size();i++){
+        Amenity a = l.get(i);
+        String s = a.getName();
+
+        query = query.concat("and EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = \'" +
+                s+"\') ");
+      }
+    PreparedStatement s = connection.prepareStatement("select avg((price/(datediff(Date_To,Date_From)+1))*30) as average_ppm\n" +
+            "from listing L natural join calendar_section \n" +
+            "where  country = ? and city = ? and\n" +
+            " year(Date_To)+10 >= year(now()) \n"+
+            query);
+    s.setString(1,Country);
+    s.setString(2,City);
+    ResultSet r = s.executeQuery();
+    while (r.next()){
+      price = r.getDouble("average_ppm");
+      if(r.wasNull()){
+        price = -1.0;
+      }
+    }}catch (SQLException exception){
+      exception.printStackTrace();
+      return price;
+    }
+    return price;
+  }
   public void createListing() {
     String title = MenuUtils.askString("Title of listing");
     String address = MenuUtils.askString("Street address");
@@ -57,8 +94,8 @@ public class HostMenu {
     String postalCode = MenuUtils.askString("Postal code");
     double latitude = MenuUtils.askDouble("Latitude");
     double longitude = MenuUtils.askDouble("Longitude");
-
     var listing = new Listing(host, title, address, city, country, postalCode, latitude, longitude);
+
     addAmenities(listing);
 
     try {
@@ -81,15 +118,25 @@ public class HostMenu {
     amenities.removeIf(a -> listing.hasAmenity(a));
 
     boolean finished = false;
-
-    while (!finished) {
+        while (!finished) {
       String[] options = new String[amenities.size() + 1];
       for (int i = 0; i < amenities.size(); i++) {
         options[i] = amenities.get(i).getName();
       }
       options[amenities.size()] = "Finish";
+      System.out.println("----------------------------------------------------------------------------------------------------------------------------------------");
+          double ppm = suggest_price(listing.getCity(), listing.getCountry(),listing.getAmenities(),null );
+          if(ppm>0)
+            System.out.println("Based on leasings of last 10 years in your city with all the amenities you currently have, we estimate a price point of $"+ppm+" per month");
 
+          for(int j=0;j<amenities.size();j++){
+        double ppm_new = suggest_price(listing.getCity(), listing.getCountry(), listing.getAmenities(),amenities.get(j));
+        if(ppm_new>0){
+          System.out.println("If you add "+amenities.get(j).getName()+" You are expected to increase price per month by: $"+(ppm_new-ppm));
+        }
+      }
       int choice = MenuUtils.menu("Add amenity", options);
+
       if (choice == amenities.size() + 1) {
         finished = true;
       } else {
