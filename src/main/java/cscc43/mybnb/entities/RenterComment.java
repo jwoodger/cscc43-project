@@ -14,7 +14,7 @@ public class RenterComment extends Comment {
   public static List<RenterComment> getAllForListing(Connection connection, int listingId) throws SQLException {
     var comments = new ArrayList<RenterComment>();
     var sql = "SELECT * FROM Renter_Comment R JOIN Comment C ON R.Comment_ID = C.Comment_ID JOIN User U ON R.Renter_ID = U.User_ID\n "
-        + " WHERE L.Listing_ID = ?";
+        + " WHERE R.Listing_ID = ?";
     var stmt = connection.prepareStatement(sql);
     stmt.setInt(1, listingId);
 
