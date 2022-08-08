@@ -27,6 +27,7 @@ public class GeneralReport {
         int c = MenuUtils.menu("By city or city/zipcode","City","Zipcode");
         LocalDate low = MenuUtils.askDate("Start Date?");
         LocalDate up = MenuUtils.askDate("End Date?");
+        System.out.println("Showing #Bookings for Leases that are from "+low+" to "+up+" on calendar section");
         if(c==1){
             PreparedStatement s = connection.prepareStatement("select b.Country,b.City,count(BookingId) as count\n" +
                     "from (select * from Booking natural join Calendar_Section natural join Listing\n" +
@@ -154,7 +155,7 @@ public class GeneralReport {
                     "where ? <= date(BookedOn) and date(BookedOn) <= ?\n" +
                     "group by Country,City,Username\n" +
                     "having count(BookingId) >= 2\n" +
-                    "order by Country,City,count(BookingId);");
+                    "order by Country,City,count(BookingId) desc;");
             s.setDate(1, Date.valueOf(low));
             s.setDate(2, Date.valueOf(up));
             ResultSet r = s.executeQuery();
@@ -166,9 +167,10 @@ public class GeneralReport {
         }else{
 
             PreparedStatement s = connection.prepareStatement("\n" +
-                    "select username,count(Bookingid) as count\n" +
+                    "select username,count(BookingId) as count\n" +
                     "from renter_user a left join (select * from Booking where date(BookedOn)>= ? and date(BookedOn) <= ? ) b on a.Renter_ID = b.Renter_ID\n" +
-                    "group by username");
+                    "group by username " +
+                    "order by count(BookingId) desc");
             s.setDate(1, Date.valueOf(low));
             s.setDate(2, Date.valueOf(up));
             ResultSet r = s.executeQuery();

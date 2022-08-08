@@ -70,13 +70,13 @@ from renter_user natural join booking natural join calendar_section natural join
 where ? <= date(BookedOn) and date(BookedOn) <= ?
 group by country,city,username
 having count(bookingid) >= 2
-order by country,city,count(bookingid);
+order by country,city,count(bookingid) desc;
 -- not per city
 
 select username,count(Bookingid) as count
 from renter_user a left join (select * from booking where date(BookedOn)>= ? and date(BookedOn) <= ? ) b on a.renter_id = b.renter_id
 group by username
- 
+ order by count(bookingid) desc;
  order by count(Bookingid);
 -- report F 
 -- Renters with Highest cancellations
