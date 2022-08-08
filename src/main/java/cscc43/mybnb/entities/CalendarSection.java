@@ -135,7 +135,8 @@ public class CalendarSection {
   }
 
   public void updateAvailability(Connection connection, boolean available) throws SQLException {
-    var sql = "UPDATE Calendar_Section SET Available = ? WHERE Calendar_ID = ?";
+    System.out.println("Changing availability Note:Booked Calendar Sections have to be cancelled!");
+    var sql = "UPDATE Calendar_Section SET Available = ? WHERE Calendar_ID = ? AND Renter_ID = null";
     var stmt = connection.prepareStatement(sql);
     stmt.setBoolean(1, available);
     stmt.executeUpdate();

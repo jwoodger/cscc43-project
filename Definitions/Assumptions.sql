@@ -41,6 +41,8 @@ We assume that all IDs used are final and cannot be updated, only deleted
     triggers make sure to take appropriate steps
     We also use booking_id and note time of booking, since multiple bookings can be made / cancelled,
     which are used for reports.
+    Hosts can cancel a booking on the day and any day before.
+    Renters can only cancel any day before.
 */
 
 -- Comments

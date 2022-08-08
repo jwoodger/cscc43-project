@@ -81,9 +81,9 @@ group by username
 -- report F 
 -- Renters with Highest cancellations
 select b.username,count(bookingid) as count
-from (select * from renter_user natural join booking where cancelled = 1 and ?<=year(BookedOn) and year(BookedOn)<?) a right join renter_user b on a.username = b.username
+from (select * from renter_user natural join booking where cancelled = 1 and 2022<=year(BookedOn) and year(BookedOn)<2023) a right join renter_user b on a.username = b.username
 group by b.username
-order by count(bookingid) asc
+order by count(bookingid) desc
 limit 5;
 -- Hosts with Highest cancellations
 select b.username, count(bookingid) as count
@@ -91,7 +91,7 @@ from (select * from booking natural join calendar_section natural join listing n
 ?<=year(BookedOn) and year(BookedOn)<?) a
 right join host_user b on a.username = b.username
 group by b.username
-order by count(bookingid) asc
+order by count(bookingid) desc
 limit 5;
 select year(BookedOn)<2023 and year(BookedOn)>=2022, BookedOnhost_user
 from Booking;

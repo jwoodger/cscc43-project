@@ -187,7 +187,7 @@ public class GeneralReport {
         PreparedStatement s = connection.prepareStatement("select b.username,count(bookingid) as count\n" +
                 "from (select * from renter_user natural join booking where cancelled = 1 and ?<=year(BookedOn) and year(BookedOn)<? ) a right join renter_user b on a.username = b.username\n" +
                 "group by b.username\n" +
-                "order by count(bookingid) asc\n" +
+                "order by count(bookingid) desc\n" +
                 "limit 5;");
         s.setInt(1,year);
         s.setInt(2,year+1);
@@ -202,7 +202,7 @@ public class GeneralReport {
                 " ?<=year(BookedOn) and year(BookedOn)<? ) a\n" +
                 "right join host_user b on a.username = b.username\n" +
                 "group by b.username\n" +
-                "order by count(bookingid) asc\n" +
+                "order by count(bookingid) desc\n" +
                 "limit 5;");
         s2.setInt(1,year);
         s2.setInt(2,year+1);
