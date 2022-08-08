@@ -84,7 +84,7 @@ CREATE TABLE Listing(
   Country VARCHAR(32) NOT NULL CHECK (LENGTH(Country)>0),
   Postal_Code CHAR(6) NOT NULL,
   Latitude FLOAT CHECK(Latitude >= -90 AND Latitude <=90),
-  Longitude FLOAT CHECK(Longitude >= -90 AND Longitude <=90),
+  Longitude FLOAT CHECK(Longitude >= -180 AND Longitude <=180),
   PRIMARY KEY(Listing_ID)
 );
 -- error message and check on insert
@@ -105,7 +105,7 @@ end if;
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Country cannot be empty';
 end if;
-    if  new.Latitude<-90 OR new.Latitude>90 OR new.Longitude>90 or new.Longitude <-90 then
+    if  new.Latitude<-90 OR new.Latitude>90 OR new.Longitude>180 or new.Longitude <-180 then
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Invalid Coordinates';
 end if; 
@@ -130,7 +130,7 @@ end if;
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Country cannot be empty';
 end if;
-    if  new.Latitude<-90 OR new.Latitude>90 OR new.Longitude>90 or new.Longitude <-90 then
+    if  new.Latitude<-90 OR new.Latitude>90 OR new.Longitude>180 or new.Longitude <-180 then
         SIGNAL SQLSTATE '45000'   
         SET MESSAGE_TEXT = 'Invalid Coordinates';
 end if; 

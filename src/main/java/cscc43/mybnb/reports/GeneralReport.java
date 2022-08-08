@@ -198,7 +198,7 @@ public class GeneralReport {
             System.out.println(r.getString("username")+"    "+r.getString("Count"));
         }
         PreparedStatement s2 = connection.prepareStatement("select b.username, count(BookingId) as count\n" +
-                "from (select * from Booking natural join Calendar_Section natural join Listing natural join Host natural join host_user where cancelled = 2 and\n" +
+                "from (select username,BookingID from Booking b join Calendar_Section c on b.Calendar_ID = c.Calendar_ID natural join Listing natural join Host natural join host_user where Cancelled = 2 and\n" +
                 " ?<=year(BookedOn) and year(BookedOn)<? ) a\n" +
                 "right join host_user b on a.username = b.username\n" +
                 "group by b.username\n" +

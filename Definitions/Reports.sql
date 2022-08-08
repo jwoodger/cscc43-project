@@ -87,8 +87,8 @@ order by count(bookingid) desc
 limit 5;
 -- Hosts with Highest cancellations
 select b.username, count(bookingid) as count
-from (select * from booking natural join calendar_section natural join listing natural join host natural join host_user where cancelled = 2 and
-?<=year(BookedOn) and year(BookedOn)<?) a
+from (select username,bookingid from booking b join calendar_section c on b.Calendar_ID = c.Calendar_ID natural join listing natural join host natural join host_user where cancelled = 2 and
+2022<=year(BookedOn) and year(BookedOn)<2023) a
 right join host_user b on a.username = b.username
 group by b.username
 order by count(bookingid) desc

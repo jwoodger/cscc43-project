@@ -60,7 +60,7 @@ public class QueryMenu {
     public boolean printresults() throws SQLException{
         Statement s = connection.createStatement();
         int order = MenuUtils.menu("Sort by Price:","Ascending","Descending");
-        ResultSet r = s.executeQuery("select * from v2 order by Price "+((order==1)?"asc":"desc"));
+        ResultSet r = s.executeQuery("select * from v2 order by price "+((order==1)?"asc":"desc"));
         if(!r.isBeforeFirst()){System.out.println("No results found!");
         return false;
         }
@@ -132,7 +132,7 @@ public class QueryMenu {
         System.out.println("Skipping the filter on Country / City, since that was specified earlier");
     }
     if(c==1 && exact == false && postal == false){
-        PreparedStatement ps = connection.prepareStatement("create view temp3 as select * from v1 where " +
+        PreparedStatement ps = connection.prepareStatement("create view temp3 as select * from temp2 where " +
                 " Country = ? and City LIKE ?");
         String country = MenuUtils.askString("Country ?");
         String City = MenuUtils.askString("City? (write % for all cities)");
@@ -191,7 +191,7 @@ public class QueryMenu {
     public void distance() throws SQLException{
         Statement sql = connection.createStatement();
         double lat1 = MenuUtils.askDouble("Latitude ( -90 to 90 ) ?");
-        double lng1 = MenuUtils.askDouble("Longitude ( -90 to 90 ) ?");
+        double lng1 = MenuUtils.askDouble("Longitude ( -180 to 180 ) ?");
         double distance = MenuUtils.askDouble("Distance in km? (enter <= 0 for default value)");
         if(distance<=0)distance = 10.0;
         sql.executeUpdate("create view v1 as select * from Listing where " +

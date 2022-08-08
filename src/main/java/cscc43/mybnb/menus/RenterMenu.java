@@ -93,7 +93,7 @@ public class RenterMenu {
       return null;
     }
 
-    info.removeIf(p);
+    //info.removeIf(p);
 
     if (info == null || info.size() == 0) {
       System.out.println("No non-cancelled bookings Recently.");
