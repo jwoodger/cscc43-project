@@ -61,6 +61,10 @@ public class RenterMenu {
     CalendarSection bookedSection = null;
     try {
       bookedSection = CalendarSection.getForId(connection, id);
+      if(bookedSection.isAvailable()==false){
+        System.out.println("Unavailable Section");
+        bookedSection = null;
+      }
     } catch (SQLException e) {
       MenuUtils.showError(e);
       return;
