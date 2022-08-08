@@ -82,8 +82,8 @@ public class CalendarSectionMenu {
       return;
     }
 
-    info.removeIf(bi -> bi.getCalendarFrom().isBefore(LocalDate.now()));
-
+    info.removeIf(bi -> bi.getCalendarFrom().isBefore(LocalDate.now())||bi.getCalendarFrom().isEqual(LocalDate.now()));
+    if(info.isEmpty())return;
     String[] names = new String[info.size()];
     for (int i = 0; i < info.size(); i++) {
       var bi = info.get(i);
