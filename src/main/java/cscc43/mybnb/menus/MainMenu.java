@@ -23,19 +23,24 @@ public class MainMenu {
           "Delete user.",
           "Generate reports.",
           "Quit");
-      switch (result) {
-        case 1:
-          new LoginMenu(connection).start();
-          break;
-        case 2:
-          new RegistrationMenu(connection).start();
-          break;
-        case 3:
-          deleteUser();
-          break;
-        case 4:
-          reports();
-          break;
+      try {
+        switch (result) {
+          case 1:
+            new LoginMenu(connection).start();
+            break;
+          case 2:
+            new RegistrationMenu(connection).start();
+            break;
+          case 3:
+            deleteUser();
+            break;
+          case 4:
+            reports();
+            break;
+        }
+      }
+      catch (Exception e){
+        System.out.println(e.getMessage());
       }
     }
   }
