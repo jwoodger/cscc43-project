@@ -1,4 +1,4 @@
-drop database mybnb;
+drop database if exists mybnb;
 create database mybnb;
 use mybnb;
 
