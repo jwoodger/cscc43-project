@@ -48,6 +48,8 @@ public class NounPhraseReport {
   }
 
   void createTempTable() throws SQLException {
+    var s = connection.createStatement();
+    s.execute("DROP TABLE IF EXISTS NP_Report");
     var stmt = connection.prepareStatement("CREATE TEMPORARY TABLE NP_Report ("
         + "Listing_ID INTEGER, "
         + "Noun_Phrase VARCHAR(64))"
