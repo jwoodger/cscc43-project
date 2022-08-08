@@ -64,12 +64,6 @@ END;
 //
 delimiter ;
 
-
-
-
-
-
-
 CREATE TABLE Host(
   Host_ID INTEGER PRIMARY KEY,
   FOREIGN KEY (Host_ID) REFERENCES User(User_ID) ON DELETE CASCADE ON UPDATE CASCADE
@@ -143,15 +137,7 @@ end if;
 END;
 //
 delimiter ;
-/*
-CREATE TABLE Hosting (
-  Host_ID INTEGER,
-  Listing_ID INTEGER,
-  FOREIGN KEY (Host_ID) REFERENCES Host(Host_ID),
-  FOREIGN KEY (Listing_ID) REFERENCES Listing(Listing_ID)
-);
-not necessary since its a one to many relationship 
-*/
+
 
 CREATE TABLE Amenity(
   Name VARCHAR(32) not null CHECK (length(Name)!=0),
@@ -163,7 +149,6 @@ Todo: Add more amenities
 */
 
 Insert into Amenity(Name) values ("Wifi"),("Cable"),("Hydro"),("Water"),("Guest Bedroom");
-
 
 /*
 keep this table since it is a many to many relation
@@ -191,7 +176,6 @@ CREATE TABLE Calendar_Section(
   CONSTRAINT CHECK (Price > 0.0),
   foreign key (Listing_ID) references Listing(Listing_ID) ON UPDATE CASCADE ON DELETE CASCADE,
   foreign key (Renter_ID) references Renter(Renter_ID) ON UPDATE CASCADE ON DELETE CASCADE
-  
   
 );
 
@@ -383,12 +367,3 @@ CREATE TABLE Renter_Comment(
 	-- make sure that the renter is commenting on a listing they have actually rented
 );
 
-/*
-similar as before since its a one to many , just add a Calendar id on the comments relation
-CREATE TABLE Comment_On(
-  Calendar_ID INTEGER,
-  Comment_ID INTEGER,
-  FOREIGN KEY (Calendar_ID) REFERENCES Calendar_Section(Calendar_ID),
-  FOREIGN KEY (Comment_ID) REFERENCES Comment(Comment_ID),
-  PRIMARY KEY (Calendar_ID,Comment_ID)
-);*/

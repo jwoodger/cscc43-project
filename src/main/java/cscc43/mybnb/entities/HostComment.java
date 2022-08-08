@@ -13,8 +13,8 @@ public class HostComment extends Comment {
 
   public static List<HostComment> getAllForRenter(Connection connection, int renterId) throws SQLException {
     var comments = new ArrayList<HostComment>();
-    var sql = "SELECT * FROM Host_Comment H JOIN Comment C ON H.Comment_ID = C.Comment_ID JOIN User U ON U.User_ID = H.Host_ID"
-        + "WHERE H.Renter_ID = ?";
+    var sql = "SELECT * FROM Host_Comment H JOIN Comment C ON H.Comment_ID = C.Comment_ID JOIN User U ON U.User_ID = H.Host_ID\n"
+        + " WHERE H.Renter_ID = ?";
     var stmt = connection.prepareStatement(sql);
 
     stmt.setInt(1, renterId);

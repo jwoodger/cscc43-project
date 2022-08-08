@@ -15,12 +15,13 @@ public class App {
     InputStream passwordFile = ClassLoader.getSystemResourceAsStream(fileName);
     BufferedReader reader = new BufferedReader(new InputStreamReader(passwordFile));
     return reader.readLine();
+
   }
 
   public static void main(String[] args) throws SQLException {
     String password;
     try {
-      password = loadPassword("password.txt");
+      password = loadPassword(".put-password-here");
     } catch (IOException exception) {
       System.err.println("Could not find password.txt file.");
       return;
