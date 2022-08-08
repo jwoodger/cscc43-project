@@ -240,10 +240,10 @@ public class QueryMenu {
 
         }
     public void bytitle() throws SQLException{
-        PreparedStatement sql = connection.prepareStatement("create v1 as select * from Listing where " +
-                "Title like ?");
         String title = MenuUtils.askString("Title?");
-        sql.setString(1,title+"%");
+        PreparedStatement sql = connection.prepareStatement("create v1 as select * from Listing where " +
+                "STRCMP(Title, ?) = 0");
+        sql.setString(1, title);
         sql.executeUpdate();
     }
 
