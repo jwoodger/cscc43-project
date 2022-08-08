@@ -194,4 +194,11 @@ public class Listing {
     insertStmt.close();;
     return -1;
   }
+
+  public void delete(Connection connection) throws SQLException {
+    var stmt = connection.prepareStatement("DELETE FROM Listing WHERE Listing_ID = ?");
+    stmt.setInt(1, id);
+
+    stmt.executeUpdate();
+  }
 }

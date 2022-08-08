@@ -18,29 +18,37 @@ public class CalendarSectionMenu {
   }
 
   public void start() {
-    int e = MenuUtils.menu("Editing calendar section",
-        "Change price",
-        "Change date range",
-        "Cancel bookings"
-    );
-    switch (e) {
-      case 1:
-        if (section.isAvailable()) {
-          changePrice();
-        } else {
-          System.out.println("Section is already booked; cannot change price.");
-        }
-        break;
-      case 2:
-        if (section.isAvailable()) {
-          changeDate();
-        } else {
-          System.out.println("Section is already booked; cannot change dates.");
-        }
-        break;
-      case 3:
-        cancelBookings();
-        break;
+    int e = 0;
+    while (e != 5) {
+      e = MenuUtils.menu("Editing calendar section",
+          "Change price",
+          "Change date range",
+          "Cancel bookings",
+          "Set availability",
+          "Exit"
+      );
+      switch (e) {
+        case 1:
+          if (section.isAvailable()) {
+            changePrice();
+          } else {
+            System.out.println("Section is already booked; cannot change price.");
+          }
+          break;
+        case 2:
+          if (section.isAvailable()) {
+            changeDate();
+          } else {
+            System.out.println("Section is already booked; cannot change dates.");
+          }
+          break;
+        case 3:
+          cancelBookings();
+          break;
+        case 4:
+          setAvailability();
+          break;
+      }
     }
   }
 
@@ -85,6 +93,17 @@ public class CalendarSectionMenu {
 
     try {
       booking.cancelByHost(connection);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+  }
+
+  public void setAvailability() {
+    int c = MenuUtils.menu("Set availability", "Make available", "Make unavailable");
+    boolean a = c == 1;
+    try {
+      section.updateAvailability(connection, a);
     } catch (SQLException e) {
       MenuUtils.showError(e);
       return;

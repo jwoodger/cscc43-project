@@ -7,6 +7,7 @@ import cscc43.mybnb.entities.HostComment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
 
+import cscc43.mybnb.entities.RenterComment;
 import java.awt.MenuItem;
 import java.sql.*;
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class HostMenu {
 
   public void start() {
     int choice = 0;
-    while (choice != 6) {
+    while (choice != 9) {
       String prompt = String.format("Logged in as %s", host.getUsername());
       choice = MenuUtils.menu(prompt,
           "Create listing",
@@ -33,6 +34,9 @@ public class HostMenu {
           "Edit listing",
           "Edit calendar section",
           "Comment on user",
+          "View comments on listing",
+          "Remove listing",
+          "Remove calendar section",
           "Log out");
       switch (choice) {
         case 1:
@@ -49,6 +53,15 @@ public class HostMenu {
           break;
         case 5:
           commentOnUser();
+          break;
+        case 6:
+          viewRenterComments();
+          break;
+        case 7:
+          removeListing();
+          break;
+        case 8:
+          removeCalendarSection();
           break;
       }
     }
@@ -292,5 +305,123 @@ public class HostMenu {
     CalendarSection section = calendarSections.get(c - 1);
 
     new CalendarSectionMenu(connection, section).start();
+  }
+
+  public void viewRenterComments() {
+    List<Listing> listings = null;
+    try {
+      listings = Listing.getAllForHost(connection, host);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+    if (listings.size() == 0) {
+      System.out.println("No listings for this host. Please create a listing first.");
+      return;
+    }
+
+    String[] names = new String[listings.size()];
+    for (int i = 0; i < listings.size(); i++) {
+      names[i] = listings.get(i).getTitle();
+    }
+
+    int choice = MenuUtils.menu("Listing to view", names);
+    Listing listing = listings.get(choice - 1);
+
+    List<RenterComment> comments = null;
+    try {
+      comments = RenterComment.getAllForListing(connection, listing.getId());
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+
+    if (comments.size() == 0) {
+      System.out.println("No comments available");
+      return;
+    }
+
+    for (RenterComment c : comments) {
+      String s = String.format("%s:\n%s\nRating: %d / 5", c.getRenterUsername(), c.getText(), c.getRating());
+      System.out.println(s);
+    }
+  }
+
+  public void removeListing() {
+    List<Listing> listings = null;
+    try {
+      listings = Listing.getAllForHost(connection, host);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+    if (listings.size() == 0) {
+      System.out.println("No listings for this host. Please create a listing first.");
+      return;
+    }
+
+    String[] names = new String[listings.size()];
+    for (int i = 0; i < listings.size(); i++) {
+      names[i] = listings.get(i).getTitle();
+    }
+
+    int choice = MenuUtils.menu("Listing to view", names);
+    Listing listing = listings.get(choice - 1);
+
+    try {
+      listing.delete(connection);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+  }
+
+  public void removeCalendarSection() {
+    List<Listing> listings = null;
+    try {
+      listings = Listing.getAllForHost(connection, host);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+    if (listings.size() == 0) {
+      System.out.println("No listings for this host. Please create a listing first.");
+      return;
+    }
+
+    String[] names = new String[listings.size()];
+    for (int i = 0; i < listings.size(); i++) {
+      names[i] = listings.get(i).getTitle();
+    }
+
+    int choice = MenuUtils.menu("Listing to view", names);
+    Listing listing = listings.get(choice - 1);
+
+    List<CalendarSection> calendarSections = null;
+    try {
+      calendarSections = CalendarSection.getAllForListing(connection, listing);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+    if (calendarSections.size() == 0) {
+      System.out.println("No calendar sections for this listing. Please create an availability first.");
+      return;
+    }
+
+    String[] csNames = new String[calendarSections.size()];
+    for (int i = 0; i < calendarSections.size(); i++) {
+      CalendarSection cs = calendarSections.get(i);
+      csNames[i] = String.format("%s - %s", cs.getFrom().toString(), cs.getUntil().toString());
+    }
+    int c = MenuUtils.menu("Choose calendar section", csNames);
+    CalendarSection section = calendarSections.get(c - 1);
+
+    try {
+      section.delete(connection);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
   }
 }

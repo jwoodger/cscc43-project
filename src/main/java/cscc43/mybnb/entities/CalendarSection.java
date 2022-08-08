@@ -42,6 +42,24 @@ public class CalendarSection {
     return sections;
   }
 
+  public static CalendarSection getForId(Connection connection, int id) throws SQLException {
+    var stmt =  connection.prepareStatement("SELECT * FROM Calendar_Section WHERE Calendar_ID = ?");
+    stmt.setInt(1, id);
+    ResultSet results = stmt.executeQuery();
+    if (results.next()) {
+      LocalDate from = results.getDate("Calendar_Section.Date_From").toLocalDate();
+      LocalDate to = results.getDate("Calendar_Section.Date_To").toLocalDate();
+      float price = results.getFloat("Calendar_Section.Price");
+      boolean available = results.getBoolean("Calendar_Section.Available");
+
+      var calendar = new CalendarSection(from, to, null, price);
+      calendar.id = id;
+      calendar.available = available;
+      return calendar;
+    }
+    return null;
+  }
+
   public CalendarSection(LocalDate from, LocalDate until, Listing listing, float price) {
     this.from = from;
     this.until = until;
@@ -114,5 +132,20 @@ public class CalendarSection {
 
     stmt.executeUpdate();
     stmt.close();
+  }
+
+  public void updateAvailability(Connection connection, boolean available) throws SQLException {
+    var sql = "UPDATE Calendar_Section SET Available = ? WHERE Calendar_ID = ?";
+    var stmt = connection.prepareStatement(sql);
+    stmt.setBoolean(1, available);
+    stmt.executeUpdate();
+    stmt.close();
+  }
+
+  public void delete(Connection connection) throws SQLException {
+    var stmt = connection.prepareStatement("DELETE FROM Calendar_Section WHERE Calendar_ID = ?");
+    stmt.setInt(1, id);
+
+    stmt.executeUpdate();
   }
 }

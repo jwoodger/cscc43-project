@@ -44,7 +44,7 @@ public class Renter extends User {
     var sql = "SELECT * FROM User U JOIN Renter R ON U.User_ID = R.Renter_ID "
       + "WHERE U.User_ID IN "
       + "(SELECT B.Renter_ID FROM Booking B JOIN Calendar_Section C ON B.Calendar_ID = C.Calendar_ID JOIN Listing L ON C.Listing_ID = L.Listing_ID "
-      + "WHERE L.Host_ID = ? AND NOW() > C.Date_To AND NOW <= (C.Date_To + YEAR(1)))";
+      + "WHERE L.Host_ID = ? AND NOW() > C.Date_To AND NOW <= (C.Date_To + INTERVAL 1 YEAR))";
     var stmt = connection.prepareStatement(sql);
     stmt.setInt(1, host.getId());
 

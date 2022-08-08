@@ -3,6 +3,7 @@ package cscc43.mybnb.menus;
 import cscc43.mybnb.entities.Booking;
 import cscc43.mybnb.entities.CalendarSection;
 import cscc43.mybnb.entities.Comment;
+import cscc43.mybnb.entities.HostComment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
 import cscc43.mybnb.entities.RenterComment;
@@ -22,12 +23,13 @@ public class RenterMenu {
 
   public void start() {
     int choice = 0;
-    while (choice != 4) {
+    while (choice != 5) {
       String prompt = String.format("Logged in as %s", renter.getUsername());
       choice = MenuUtils.menu(prompt,
           "Book listing",
           "Cancel booking",
           "Comment on listing",
+          "View comments about you",
           "Log out");
       switch (choice) {
         case 1:
@@ -39,6 +41,9 @@ public class RenterMenu {
         case 3:
           comment();
           break;
+        case 4:
+          viewHostComments();
+          break;
       }
     }
   }
@@ -48,45 +53,17 @@ public class RenterMenu {
     if (!results)
       return;
 
-    int id = MenuUtils.askInt("Enter ID of listing.");
-    Listing listing = null;
+    int id = MenuUtils.askInt("Enter ID of calendar section.");
+    CalendarSection bookedSection = null;
     try {
-      // TODO: select when different listings have the same title
-      listing = Listing.getById(connection, id);
-    } catch (SQLException e) {
-      MenuUtils.showError(e);
-      return;
-    }
-    if (listing == null) {
-      System.out.println("Could not find listing with that ID.");
-      return;
-    }
-
-    List<CalendarSection> sections = null;
-    try {
-      sections = CalendarSection.getAllForListing(connection, listing);
+      bookedSection = CalendarSection.getForId(connection, id);
     } catch (SQLException e) {
       MenuUtils.showError(e);
       return;
     }
 
-    sections.removeIf(c -> !c.isAvailable());
-
-    if (sections.size() == 0) {
-      System.out.println("No availability for this listing.");
-      return;
-    }
-
-    String[] sectionNames = new String[sections.size()];
-    for (int i = 0; i < sections.size(); i++) {
-      CalendarSection cs = sections.get(i);
-      sectionNames[i] = String.format("%s - %s", cs.getFrom().toString(), cs.getUntil().toString());
-    }
-
-    int choice = MenuUtils.menu("Choose availability", sectionNames);
-    CalendarSection bookedSection = sections.get(choice - 1);
-    if (!bookedSection.isAvailable()) {
-      System.out.println("Section is not available.");
+    if (bookedSection == null) {
+      System.out.println("Could not access calendar section.");
       return;
     }
 
@@ -152,6 +129,27 @@ public class RenterMenu {
     } catch (SQLException e) {
       MenuUtils.showError(e);
       return;
+    }
+  }
+
+  public void viewHostComments() {
+    List<HostComment> comments = null;
+
+    try {
+      comments = HostComment.getAllForRenter(connection, renter.getId());
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+
+    if (comments.size() == 0) {
+      System.out.println("No comments available");
+      return;
+    }
+
+    for (HostComment c : comments) {
+      String s = String.format("%s:\n%s\nRating: %d / 5", c.getHostUsername(), c.getText(), c.getRating());
+      System.out.println(s);
     }
   }
 }
