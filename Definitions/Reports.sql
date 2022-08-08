@@ -56,13 +56,13 @@ group by Country,City,username) a left join listing b on a.host_ID = b.host_ID a
 group by a.country,a.username
 order by a.country,count(Listing_ID) desc;
 -- report D
-select Country,City,username
+select Country,City,username,count
 from(
 select Country,City,username,count(*) as count
 from listing l natural join host_user
 group by Country,City,username
-) L
-where count >0.1*(select count(*) from listing l where L.city = l.city and L.country = l.country);
+) L natural join (select Country,City,count(*) as total  from listing group by Country,City) t
+where count >0.1*(total);
 -- report E
 -- per city
 select country,city,username,count(bookingid) as count

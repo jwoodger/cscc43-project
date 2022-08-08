@@ -130,13 +130,13 @@ public class GeneralReport {
     }
     public void commercial() throws SQLException{
         Statement s = connection.createStatement();
-        ResultSet r = s.executeQuery("select Country,City,username\n" +
+        ResultSet r = s.executeQuery("select Country,City,username,count\n" +
                 "from(\n" +
                 "select Country,City,username,count(*) as count\n" +
-                "from Listing l natural join host_user\n" +
+                "from listing l natural join host_user\n" +
                 "group by Country,City,username\n" +
-                ") L\n" +
-                "where count >0.1*(select count(*) from Listing l where L.City = l.City and L.Country = l.Country);");
+                ") L natural join (select Country,City,count(*) as total  from listing group by Country,City) t\n" +
+                "where count >0.1*(total);");
         System.out.println("Country     City    Username");
         while (r.next()){
             System.out.println(r.getString("Country")+"     "+r.getString("City")+"     "+
