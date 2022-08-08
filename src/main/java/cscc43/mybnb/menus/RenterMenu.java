@@ -80,7 +80,7 @@ public class RenterMenu {
     }
   }
 
-  public Booking.Info chooseBooking(Predicate<Booking.Info> p) {
+  public Booking.Info chooseBookingRecent(Predicate<Booking.Info> p) {
     List<Booking.Info> info = null;
     try {
       info = Booking.getAllRecent(connection, renter);
@@ -88,12 +88,14 @@ public class RenterMenu {
       MenuUtils.showError(e);
       return null;
     }
-    if (info.size() == 0) {
-      System.out.println("No non-cancelled bookings from the last 30 days.");
+
+    info.removeIf(p);
+
+    if (info == null || info.size() == 0) {
+      System.out.println("No non-cancelled bookings Recently.");
       return null;
     }
 
-    info.removeIf(p);
 
     String[] names = new String[info.size()];
     for (int i = 0; i < info.size(); i++) {
@@ -108,9 +110,40 @@ public class RenterMenu {
     int choice = MenuUtils.menu("Choose booking", names);
     return info.get(choice - 1);
   }
+  public Booking.Info chooseBooking(Predicate<Booking.Info> p) {
+    List<Booking.Info> info = null;
+    try {
+      info = Booking.getAll(connection, renter);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return null;
+    }
+
+    info.removeIf(p);
+
+    if (info == null || info.size() == 0) {
+      System.out.println("No non-cancelled bookings found.");
+      return null;
+    }
+
+
+    String[] names = new String[info.size()];
+    for (int i = 0; i < info.size(); i++) {
+      var bi = info.get(i);
+      names[i] = String.format("%s: %s - %s; booked %s",
+              bi.getListingTitle(),
+              bi.getCalendarFrom().toString(),
+              bi.getCalendarTo().toString(),
+              bi.getBooking().getBookedDate().toString());
+    }
+
+    int choice = MenuUtils.menu("Choose booking", names);
+    return info.get(choice - 1);
+  }
 
   public void comment() {
-    var info = chooseBooking(bi -> true);
+    var info = chooseBookingRecent(bi -> true);
+    if(info == null)return;
     var booking = info.getBooking();
     var listingId = info.getListingId();
 

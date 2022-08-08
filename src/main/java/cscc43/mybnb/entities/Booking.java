@@ -93,14 +93,25 @@ public class Booking {
       + "FROM Booking B JOIN Calendar_Section C ON B.Calendar_ID = C.Calendar_ID "
       + "JOIN Listing L ON C.Listing_ID = L.Listing_ID "
       + "JOIN User U ON C.Renter_ID = U.User_ID "
-      + "WHERE B.Renter_ID = ? AND B.BookedOn > NOW() - INTERVAL 1 YEAR AND NOT B.Cancelled"
+      + "WHERE B.Renter_ID = ? AND C.Date_To < NOW() and C.Date_To  > NOW() - INTERVAL 1 YEAR AND  B.Cancelled = 0"
     );
     stmt.setInt(1, renter.getId());
     var info = getList(stmt);
     stmt.close();
     return info;
   }
-
+  public static List<Info> getAll(Connection connection, Renter renter) throws SQLException {
+    var stmt = connection.prepareStatement("SELECT B.*, C.Date_From, C.Date_To, L.Title, L.Listing_ID, U.username "
+            + "FROM Booking B JOIN Calendar_Section C ON B.Calendar_ID = C.Calendar_ID "
+            + "JOIN Listing L ON C.Listing_ID = L.Listing_ID "
+            + "JOIN User U ON C.Renter_ID = U.User_ID "
+            + "WHERE B.Renter_ID = ? AND B.Cancelled = 0"
+    );
+    stmt.setInt(1, renter.getId());
+    var info = getList(stmt);
+    stmt.close();
+    return info;
+  }
   public static List<Info> getAllForCalendar(Connection connection, CalendarSection section) throws SQLException {
     var stmt = connection.prepareStatement("SELECT B.*, C.Date_From, C.Date_To, L.Title, L.Listing_ID, U.username "
         + "FROM Booking B JOIN Calendar_Section C ON B.Calendar_ID = C.Calendar_ID "
