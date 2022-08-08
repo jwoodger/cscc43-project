@@ -74,7 +74,7 @@ public class HostMenu {
     try{
       String query = "";
       if(e!=null){
-        query = query.concat("and EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = \'" +
+        query = query.concat("and EXISTS(select * from Provides_Amenity P where L.Listing_ID = P.Listing_ID AND P.Amenity_Name = \'" +
                 e.getName()+"\') ");
       }
       if(l!=null && !l.isEmpty())
@@ -82,12 +82,12 @@ public class HostMenu {
         Amenity a = l.get(i);
         String s = a.getName();
 
-        query = query.concat("and EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = \'" +
+        query = query.concat("and EXISTS(select * from Provides_Amenity P where L.Listing_ID = P.Listing_ID AND P.Amenity_Name = \'" +
                 s+"\') ");
       }
     PreparedStatement s = connection.prepareStatement("select avg((price/(datediff(Date_To,Date_From)+1))*30) as average_ppm\n" +
-            "from listing L natural join calendar_section \n" +
-            "where  country = ? and city = ? and\n" +
+            "from Listing L natural join Calendar_Section \n" +
+            "where  Country = ? and City = ? and\n" +
             " year(Date_To)+10 >= year(now()) \n"+
             query);
     s.setString(1,Country);
@@ -301,7 +301,7 @@ public class HostMenu {
       CalendarSection cs = calendarSections.get(i);
       csNames[i] = String.format("%s - %s", cs.getFrom().toString(), cs.getUntil().toString());
     }
-    int c = MenuUtils.menu("Choice calendar section", csNames);
+    int c = MenuUtils.menu("Choose calendar section", csNames);
     CalendarSection section = calendarSections.get(c - 1);
 
     new CalendarSectionMenu(connection, section).start();

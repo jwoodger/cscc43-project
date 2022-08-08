@@ -21,7 +21,7 @@ public class App {
   public static void main(String[] args) throws SQLException {
     String password;
     try {
-      password = loadPassword(".put-password-here");
+      password = loadPassword("password.txt");
     } catch (IOException exception) {
       System.err.println("Could not find password.txt file.");
       return;

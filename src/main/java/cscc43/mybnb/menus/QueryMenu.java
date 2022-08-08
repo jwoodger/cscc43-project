@@ -60,7 +60,7 @@ public class QueryMenu {
     public boolean printresults() throws SQLException{
         Statement s = connection.createStatement();
         int order = MenuUtils.menu("Sort by Price:","Ascending","Descending");
-        ResultSet r = s.executeQuery("select * from v2 order by price "+((order==1)?"asc":"desc"));
+        ResultSet r = s.executeQuery("select * from v2 order by Price "+((order==1)?"asc":"desc"));
         if(!r.isBeforeFirst()){System.out.println("No results found!");
         return false;
         }
@@ -167,7 +167,7 @@ public class QueryMenu {
             //build our where clause
             String query = "";
             while(!choices.isEmpty()){
-                query = query.concat(" EXISTS(select * from provides_amenity P where L.listing_ID = P.listing_ID AND P.Amenity_Name = \'" +
+                query = query.concat(" EXISTS(select * from Provides_Amenity P where L.Listing_ID = P.Listing_ID AND P.Amenity_Name = \'" +
                         choices.get(0)+"\') ");
                 choices.remove(0);
                 if(!choices.isEmpty()){query += "AND";}else{query = "where "+query;}
@@ -194,7 +194,7 @@ public class QueryMenu {
         double lng1 = MenuUtils.askDouble("Longitude ( -90 to 90 ) ?");
         double distance = MenuUtils.askDouble("Distance in km? (enter <= 0 for default value)");
         if(distance<=0)distance = 10.0;
-        sql.executeUpdate("create view v1 as select * from listing where " +
+        sql.executeUpdate("create view v1 as select * from Listing where " +
                 "(6371 * acos( \n" +
                 "                cos( radians(Latitude) ) \n" +
                 "              * cos( radians( "+lat1+" ) ) \n" +
@@ -217,7 +217,7 @@ public class QueryMenu {
         sql.executeUpdate();
     }
     public void exact() throws SQLException{
-        PreparedStatement sql = connection.prepareStatement("create view v1 as select * from listing where " +
+        PreparedStatement sql = connection.prepareStatement("create view v1 as select * from Listing where " +
                 "Country = ? AND Postal_Code = ? AND City = ? AND Street_Address like ?");
         String country = MenuUtils.askString("Country?");
         String PC = MenuUtils.askString("PostalCode?");
@@ -230,7 +230,7 @@ public class QueryMenu {
         sql.executeUpdate();
     }
     public void byhost() throws  SQLException{
-        PreparedStatement sql = connection.prepareStatement("create view v1 as select * from listing where " +
+        PreparedStatement sql = connection.prepareStatement("create view v1 as select * from Listing where " +
                 "Host_ID = ?");
         String uname = MenuUtils.askString("Host Username?");
 
@@ -240,7 +240,7 @@ public class QueryMenu {
 
         }
     public void bytitle() throws SQLException{
-        PreparedStatement sql = connection.prepareStatement("create v1 as select * from listing where " +
+        PreparedStatement sql = connection.prepareStatement("create v1 as select * from Listing where " +
                 "Title like ?");
         String title = MenuUtils.askString("Title?");
         sql.setString(1,title+"%");

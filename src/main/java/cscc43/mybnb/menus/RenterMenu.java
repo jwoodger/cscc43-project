@@ -7,10 +7,14 @@ import cscc43.mybnb.entities.HostComment;
 import cscc43.mybnb.entities.Listing;
 import cscc43.mybnb.entities.Renter;
 import cscc43.mybnb.entities.RenterComment;
+import java.awt.print.Book;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class RenterMenu {
   private Connection connection;
@@ -76,7 +80,7 @@ public class RenterMenu {
     }
   }
 
-  public Booking.Info chooseBooking() {
+  public Booking.Info chooseBooking(Predicate<Booking.Info> p) {
     List<Booking.Info> info = null;
     try {
       info = Booking.getAllRecent(connection, renter);
@@ -89,6 +93,8 @@ public class RenterMenu {
       return null;
     }
 
+    info.removeIf(p);
+
     String[] names = new String[info.size()];
     for (int i = 0; i < info.size(); i++) {
       var bi = info.get(i);
@@ -99,12 +105,12 @@ public class RenterMenu {
           bi.getBooking().getBookedDate().toString());
     }
 
-    int choice = MenuUtils.menu("Choose booking to comment on", names);
+    int choice = MenuUtils.menu("Choose booking", names);
     return info.get(choice - 1);
   }
 
   public void comment() {
-    var info = chooseBooking();
+    var info = chooseBooking(bi -> true);
     var booking = info.getBooking();
     var listingId = info.getListingId();
 
@@ -122,7 +128,10 @@ public class RenterMenu {
   }
 
   public void cancelBooking() {
-    var info = chooseBooking();
+    var info = chooseBooking(bi -> bi.getCalendarFrom().isBefore(LocalDate.now()));
+    if (info == null) {
+      return;
+    }
 
     try {
       info.getBooking().cancelByRenter(connection);
