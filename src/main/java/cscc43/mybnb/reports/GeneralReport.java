@@ -187,7 +187,7 @@ public class GeneralReport {
         LocalDate highest = LocalDate.of(year,12,31);
         System.out.println("Showing cancelled bookings that were booked from "+lowest+" to "+highest);
         PreparedStatement s = connection.prepareStatement("select b.username,count(BookingId) as count\n" +
-                "from (select * from Renter_User natural join Booking where Cancelled = 1 and ?<=year(BookedOn) and year(BookedOn)<? ) a right join renter_user b on a.username = b.username\n" +
+                "from (select * from renter_user natural join Booking where Cancelled = 1 and ?<=year(BookedOn) and year(BookedOn)<? ) a right join renter_user b on a.username = b.username\n" +
                 "group by b.username\n" +
                 "order by count(BookingId) desc\n" +
                 "limit 5;");
