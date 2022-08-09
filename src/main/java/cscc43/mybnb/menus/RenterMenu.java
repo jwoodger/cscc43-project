@@ -27,10 +27,11 @@ public class RenterMenu {
 
   public void start() {
     int choice = 0;
-    while (choice != 5) {
+    while (choice != 6) {
       String prompt = String.format("Logged in as %s", renter.getUsername());
       choice = MenuUtils.menu(prompt,
           "Book listing",
+          "View bookings",
           "Cancel booking",
           "Comment on listing",
           "View comments about you",
@@ -40,12 +41,15 @@ public class RenterMenu {
           bookListing();
           break;
         case 2:
-          cancelBooking();
+          viewBookings();
           break;
         case 3:
-          comment();
+          cancelBooking();
           break;
         case 4:
+          comment();
+          break;
+        case 5:
           viewHostComments();
           break;
       }
@@ -82,6 +86,31 @@ public class RenterMenu {
       MenuUtils.showError(e);
       return;
     }
+  }
+
+  public void viewBookings() {
+    List<Booking.Info> info = null;
+    try {
+      info = Booking.getAllRecent(connection, renter);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+
+    if (info == null || info.size() == 0) {
+      System.out.println("No non-cancelled bookings Recently.");
+      return;
+    }
+
+    for (int i = 0; i < info.size(); i++) {
+      var bi = info.get(i);
+      System.out.printf("%s: %s - %s; booked %s\n",
+          bi.getListingTitle(),
+          bi.getCalendarFrom().toString(),
+          bi.getCalendarTo().toString(),
+          bi.getBooking().getBookedDate().toString());
+    }
+
   }
 
   public Booking.Info chooseBookingRecent(Predicate<Booking.Info> p) {

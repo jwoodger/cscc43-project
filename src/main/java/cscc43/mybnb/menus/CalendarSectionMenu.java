@@ -19,10 +19,11 @@ public class CalendarSectionMenu {
 
   public void start() {
     int e = 0;
-    while (e != 5) {
+    while (e != 6) {
       e = MenuUtils.menu("Editing calendar section",
           "Change price",
           "Change date range",
+          "View bookings",
           "Cancel bookings",
           "Set availability",
           "Exit"
@@ -43,9 +44,12 @@ public class CalendarSectionMenu {
           }
           break;
         case 3:
-          cancelBookings();
+          viewBookings();
           break;
         case 4:
+          cancelBookings();
+          break;
+        case 5:
           setAvailability();
           break;
       }
@@ -70,6 +74,22 @@ public class CalendarSectionMenu {
     } catch (SQLException e) {
       MenuUtils.showError(e);
       return;
+    }
+  }
+
+  public void viewBookings() {
+    List<Info> info = null;
+    try {
+      info = Booking.getAllForCalendar(connection, section);
+    } catch (SQLException e) {
+      MenuUtils.showError(e);
+      return;
+    }
+
+    if(info.isEmpty())return;
+    for (int i = 0; i < info.size(); i++) {
+      var bi = info.get(i);
+      System.out.printf("%s, booked %s\n", bi.getRenterUsername(), bi.getBooking().getBookedDate().toString());
     }
   }
 
